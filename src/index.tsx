@@ -20,12 +20,16 @@ import { App } from 'app';
 
 import { HelmetProvider } from 'react-helmet-async';
 
+import { ChakraProvider } from '@chakra-ui/react';
+
 import { configureAppStore } from 'store/configureStore';
 
 import reportWebVitals from 'reportWebVitals';
 
 // Initialize languages
 import './locales/i18n';
+import { theme } from 'app/core/modules/theme';
+import { DialogProvider } from 'app/components/Dialog/Dialog';
 
 const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
@@ -34,7 +38,11 @@ ReactDOM.render(
   <Provider store={store}>
     <HelmetProvider>
       <React.StrictMode>
-        <App />
+        <ChakraProvider theme={theme}>
+          <DialogProvider>
+            <App />
+          </DialogProvider>
+        </ChakraProvider>
       </React.StrictMode>
     </HelmetProvider>
   </Provider>,
