@@ -4,22 +4,19 @@ import { motion } from 'framer-motion';
 import MessageBox from 'app/components/MessageBox';
 import MessageEditor from 'app/components/MessageEditor';
 
-const ChatBox = ({ isOpen }) => {
+const ChatBox = ({ isOpen, sendMessage, messageList = [] }) => {
   const [hidden, setHidden] = useState(!isOpen);
-  const onSubmit = message => {
-    console.log(message);
-  };
   return (
     <motion.div
       hidden={hidden}
       initial={false}
       onAnimationStart={() => setHidden(false)}
       onAnimationComplete={() => setHidden(!isOpen)}
-      animate={{ width: isOpen ? 350 : 0 }}
+      animate={{ width: isOpen ? 400 : 0 }}
       style={{
         background: 'white',
         overflow: 'hidden',
-        whiteSpace: 'nowrap',
+        // whiteSpace: 'nowrap',
         left: '0',
         height: '100vh',
         top: '0',
@@ -36,8 +33,12 @@ const ChatBox = ({ isOpen }) => {
         Messages
       </Text>
       <Box display="flex" flexDirection="column" height="calc(100% - 125px)">
-        <MessageBox messageList={[]} />
-        <MessageEditor onSubmit={onSubmit} />
+        <MessageBox
+          messageList={messageList}
+          avatarSize="sm"
+          channelType="video"
+        />
+        <MessageEditor onSubmit={sendMessage} />
       </Box>
     </motion.div>
   );

@@ -19,7 +19,11 @@ const ChannelText = ({ message, handleSubmitMessage }) => {
     >
       <Box ref={msgBox} flex={1} overflowY="scroll">
         {message ? (
-          <MessageBox messageList={message} />
+          <MessageBox
+            messageList={message}
+            avatarSize="md"
+            channelType="text"
+          />
         ) : (
           <Box display="flex" justifyContent="center" alignItems="center">
             <Spinner />

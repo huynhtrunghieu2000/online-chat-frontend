@@ -2,19 +2,21 @@ import React, { Suspense, lazy, forwardRef } from 'react';
 import { Device } from 'mediasoup-client';
 import { io, Socket } from 'socket.io-client';
 import { API_URL } from 'app/config';
-import { Avatar, Box, Button, Switch } from '@chakra-ui/react';
+import { Avatar, Box, Button, Switch, useToast } from '@chakra-ui/react';
 import { SocketClient } from 'app/core/contexts/socket-client';
 import VideoClientMeet from 'app/components/VideoClientMeet';
 import CallingSection from './CallingSection';
 import { useSelector } from 'react-redux';
 import { RootState } from 'types';
 import { getToken } from 'app/core/services/storage.service';
+import { Prompt } from 'react-router-dom';
 // import { config } from '@app/core/config';
 
 const MODE_STREAM = 'stream';
 const MODE_SHARE_SCREEN = 'share_screen';
 
 function MeetRoom({ roomId }) {
+  const toast = useToast();
   const localScreen: any = React.useRef();
   const localStreamScreen: any = React.useRef();
 
@@ -35,6 +37,7 @@ function MeetRoom({ roomId }) {
   const [useAudio, setUseAudio] = React.useState(true);
   const [isStartMedia, setIsStartMedia] = React.useState(false);
   const [isConnected, setIsConnected] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [remoteVideos, setRemoteVideos]: any = React.useState({});
   const [isShareScreen, setIsShareScreen] = React.useState(false);
 
@@ -265,17 +268,17 @@ function MeetRoom({ roomId }) {
 
     disconnectSocket();
     setIsConnected(false);
+    setIsLoading(false);
   }
 
-  function playVideo(element: any, stream: any) {
+  function playVideo(element: HTMLVideoElement, stream: any) {
     if (element.srcObject) {
       console.warn('element ALREADY playing, so ignore');
       return;
     }
     element.srcObject = stream;
     element.volume = 0;
-    element.play();
-    return;
+    return element.play();
   }
 
   function pauseVideo(element: any) {
@@ -460,6 +463,7 @@ function MeetRoom({ roomId }) {
   }
 
   async function handleConnect() {
+    setIsLoading(true);
     if (!localStream.current) {
       console.warn('WARN: local media NOT READY');
       return;
@@ -534,6 +538,7 @@ function MeetRoom({ roomId }) {
         case 'connected':
           console.log('published');
           setIsConnected(true);
+          setIsLoading(false);
           break;
 
         case 'failed':
@@ -608,6 +613,9 @@ function MeetRoom({ roomId }) {
 
           case 'connected':
             console.log('subscribed');
+            sendRequest('getAllMessage', {}).then(data =>
+              setMessageList(data as any),
+            );
             //consumeCurrentProducers(clientId);
             break;
 
@@ -849,7 +857,25 @@ function MeetRoom({ roomId }) {
         removeConsumer(remoteId, kind, mode);
         removeRemoteVideo(remoteId, mode);
       });
+
+      socket.on('newMessage', data => {
+        setMessageList(data);
+      });
     });
+  };
+
+  const [messageList, setMessageList] = React.useState<any[]>([]);
+  const sendMessage = (message: string) => {
+    sendRequest('sendMessage', {
+      message,
+      userInfo: localUserInfo,
+    })
+      .then(res => {
+        setMessageList(res as any);
+      })
+      .catch(err => {
+        console.error(err);
+      });
   };
 
   const [isOnMic, setIsOnMic] = React.useState(useAudio);
@@ -870,6 +896,10 @@ function MeetRoom({ roomId }) {
 
   React.useEffect(() => {
     if (!isStartMedia) handleStartMedia();
+
+    return () => {
+      handleDisconnect();
+    };
   }, []);
 
   const userScreenShare = navigator.mediaDevices.addEventListener(
@@ -881,6 +911,14 @@ function MeetRoom({ roomId }) {
 
   return (
     <Box display="flex" justifyContent="center" height="full">
+      <Prompt
+        when={isConnected}
+        message={(location, action) => {
+          console.log(location, action);
+          console.log(isConnected);
+          return '`Are you sure you want to quit meeting?`';
+        }}
+      />
       {!isConnected ? (
         <Box pt={'32'}>
           <video
@@ -930,6 +968,7 @@ function MeetRoom({ roomId }) {
               isFullWidth={true}
               disabled={isConnected || !isStartMedia}
               onClick={handleConnect}
+              isLoading={isLoading}
             >
               Join
             </Button>
@@ -943,12 +982,16 @@ function MeetRoom({ roomId }) {
           handleToggleCamera={handleMuteVideo}
           handleToggleMic={handleMuteAudio}
           localScreenStream={localStreamScreen}
+          isStartStream={isStartMedia}
           isShareScreen={isShareScreen}
           handleStartScreenShare={handleStartScreenShare}
           handleStopScreenShare={handleDisconnectScreenShare}
           remoteVideos={remoteVideos}
           playVideo={playVideo}
           handleEndCall={handleDisconnect}
+          sendMsgCallBack={sendMessage}
+          messageList={messageList}
+          isConnected={isConnected}
         />
       )}
     </Box>

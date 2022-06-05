@@ -89,6 +89,7 @@ const RoomSideMenu = memo((props: Props) => {
     setIsOpenModal(false);
   };
 
+  const handleInviteMember = userIds => {};
   return (
     <Box
       h="full"
@@ -234,5 +235,7 @@ const CreateRoomDialog = ({ isOpen, onClose, onSubmit }) => {
     </Modal>
   );
 };
+
+const inviteMemberDialog = () => {};
 
 export default RoomSideMenu;

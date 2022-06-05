@@ -21,7 +21,7 @@ const RegisterVerify = () => {
   const dispatch = useDispatch();
   const { actions } = useAuthSliceSlice();
   const isVerified = useSelector(
-    (state: RootState) => state?.authSlice?.data.status,
+    (state: RootState) => state?.authSlice?.data?.status,
   );
   const isLoading = useSelector(
     (state: RootState) => state?.authSlice?.isLoading,

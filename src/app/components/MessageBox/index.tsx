@@ -6,14 +6,16 @@ import { messages } from './messages';
 
 interface Props {
   messageList: any[];
+  avatarSize: 'xs' | 'xl' | 'sm' | 'md' | 'lg' | 'full' | '2xs' | '2xl';
+  channelType: 'video' | 'text';
 }
 
-const MessageBox = memo(({ messageList }: Props) => {
+const MessageBox = memo(({ messageList, avatarSize, channelType }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t, i18n } = useTranslation();
 
   return (
-    <Box flex={1}>
+    <Box flex={1} width="full">
       {messageList.map((message, index) => (
         <Box
           key={index}
@@ -27,18 +29,31 @@ const MessageBox = memo(({ messageList }: Props) => {
             <Avatar
               src={message?.User?.avatar}
               name={message.User.email}
-              size="md"
+              size={avatarSize}
             />
-            <Box ml={5}>
+            <Box ml={avatarSize === 'sm' ? 2 : 5}>
               <Box display="flex" alignItems="baseline">
-                <Text lineHeight="none" pb={2} mr={3} fontWeight={500}>
+                <Text
+                  maxWidth={channelType === 'video' ? '50%' : ''}
+                  lineHeight="none"
+                  pb={2}
+                  mr={3}
+                  fontWeight={500}
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                >
                   {message.User.name || message.User.email}
                 </Text>
                 <Text fontSize="sm" lineHeight="none" color="gray.500">
-                  {moment(message.createdAt).fromNow()}
+                  {moment(message.createdAt).format(
+                    channelType === 'text' ? 'HH:mm | MMM DD, YYYY' : 'HH:mm',
+                  )}
                 </Text>
               </Box>
-              {message.message}
+              <Text width={channelType === 'video' ? '210px' : 'full'}>
+                {message.message}
+              </Text>
             </Box>
           </Box>
         </Box>

@@ -60,7 +60,11 @@ export function App() {
   }, [userData]);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter
+    // getUserConfirmation={() => {
+    //   /* Empty callback to block the default browser prompt */
+    // }}
+    >
       <Helmet
         titleTemplate={`%s - ${APP_NAME}`}
         defaultTitle={`${APP_NAME}`}

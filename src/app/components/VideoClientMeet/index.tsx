@@ -1,4 +1,4 @@
-import { Avatar, Box } from '@chakra-ui/react';
+import { Avatar, Box, Text } from '@chakra-ui/react';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { messages } from './messages';
@@ -62,21 +62,33 @@ const VideoClientMeet = memo((props: any) => {
         },
       }}
       flex="1 1 auto"
-      width={videoDimensionByParticipants(props.numberParticipants).width}
-      height={videoDimensionByParticipants(props.numberParticipants).height}
+      width={videoDimensionByParticipants(props.numberParticipant).width}
+      height={videoDimensionByParticipants(props.numberParticipant).height}
       minWidth="25%"
       maxWidth="100%"
       maxHeight="80%"
       border="5px solid"
-      borderColor="purple.500"
-      backgroundColor="gray.100"
+      borderColor="gray.100"
+      backgroundColor="gray.400"
       borderRadius="5px"
+      pos="relative"
     >
       <video ref={remoteVideo} autoPlay controls={false} />
-      <Avatar
+      {/* <Avatar
         name={'localUserInfo?.email'}
         size={props.numberParticipants === 1 ? '2xl' : 'md'}
-      />
+      /> */}
+      <Box
+        position="absolute"
+        top="2"
+        left="2"
+        p="1"
+        backgroundColor="whiteAlpha.700"
+        borderRadius="5px"
+        // display="flex"
+      >
+        <Text mr={1}>{props?.peer.info.email}</Text>
+      </Box>
     </Box>
   );
 });
