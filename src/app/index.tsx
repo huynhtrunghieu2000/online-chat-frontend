@@ -29,6 +29,7 @@ import { Box } from '@chakra-ui/react';
 import { SocketProvider } from 'app/core/contexts/socket';
 import { Room } from './pages/Room';
 import { SocketClient } from './core/contexts/socket-client';
+import AvatarUpload from './pages/Profile/components/AvatarUpload';
 
 export function App() {
   const { i18n } = useTranslation();
@@ -67,6 +68,7 @@ export function App() {
       ></Helmet>
       <Box display="flex" flexDir="column" w="full" h="full" pos="fixed">
         <NavigationBar />
+        <AvatarUpload />
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/auth" component={Auth} />

@@ -22,13 +22,11 @@ const Dashboard = (props: Props) => {
   const { t, i18n } = useTranslation();
 
   return (
-    <Box h="full" w="full" minH={768} minW={1024} pos="fixed">
-      <Box h="full">
-        <Switch>
-          <PrivateRoute path={`/dashboard`} component={DashboardContent} />
-          <Route component={NotFoundPage} />
-        </Switch>
-      </Box>
+    <Box h="full">
+      <Switch>
+        <PrivateRoute path={`/dashboard`} component={DashboardContent} />
+        <Route component={NotFoundPage} />
+      </Switch>
     </Box>
   );
 };
