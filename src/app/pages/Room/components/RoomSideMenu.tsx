@@ -79,7 +79,7 @@ const RoomSideMenu = memo((props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listRoom]);
 
-  const handleTabChange = (index: number) => {
+  const handleTabChange = (index: number) => { 
     setTabIndex(index);
   };
 
@@ -89,6 +89,9 @@ const RoomSideMenu = memo((props: Props) => {
     setIsOpenModal(false);
   };
 
+  const handleInviteMember = (userIds) => {
+
+  }
   return (
     <Box
       h="full"
@@ -234,5 +237,9 @@ const CreateRoomDialog = ({ isOpen, onClose, onSubmit }) => {
     </Modal>
   );
 };
+
+const inviteMemberDialog = () => {
+
+}
 
 export default RoomSideMenu;

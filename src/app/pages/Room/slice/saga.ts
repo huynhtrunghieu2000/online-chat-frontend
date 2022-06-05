@@ -110,6 +110,23 @@ function* createChannel({ payload }) {
   }
 }
 
+function* inviteUserToRoom({ payload }) {
+  try {
+    const data = {
+      user_ids: payload.userIds,
+    };
+    const response = yield call(
+      HTTPService.post,
+      `${API_ENDPOINT.room.index}/${payload.roomId}/invite`,
+      data,
+    );
+
+    yield put(actions.inviteUserToRoomSuccess());
+  } catch (error) {
+    yield put(actions.inviteUserToRoomError(error));
+  }
+}
+
 // function* joinChannel({ payload }) {
 //   try {
 //     const data = {
@@ -196,4 +213,5 @@ export function* roomSaga() {
   yield takeLatest(actions.createRoom, createRoom);
   yield takeLatest(actions.getChannelDetail, getChannelDetail);
   yield takeLatest(actions.createChannel, createChannel);
+  yield takeLatest(actions.inviteUserToRoom, inviteUserToRoom);
 }

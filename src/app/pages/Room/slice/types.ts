@@ -9,6 +9,7 @@ export interface RoomState {
   currentMeeting: any;
   isCreateRoomSuccess: boolean;
   isCreateChannelSuccess: boolean;
+  isInviteUserSuccess: boolean;
   isLoading: boolean;
   hasError: boolean;
   error: any;

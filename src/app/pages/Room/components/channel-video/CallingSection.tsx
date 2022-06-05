@@ -20,6 +20,10 @@ import { RootState } from 'types';
 import { useRoomSlice } from '../../slice';
 import ChatBox from './ChatBox';
 import AudioSpectrum from 'react-audio-spectrum';
+import {
+  SpectrumVisualizer,
+  SpectrumVisualizerTheme,
+} from 'react-audio-visualizers';
 
 const CallingSection = ({
   localVideoStream,
@@ -34,12 +38,19 @@ const CallingSection = ({
   remoteVideos,
   playVideo,
   handleEndCall,
+  sendMsgCallBack,
+  messageList,
+  isConnected,
+  isStartStream,
 }) => {
   const dispatch = useDispatch();
   const { actions } = useRoomSlice();
+  // const ctx = new AudioContext();
 
   const localVideo: any = useRef();
-  const localAudioElement = new Audio();
+  // const localAudio: any = new Audio();
+  // const localAudioElement = new Audio();
+  // const sourceAudio: any = useRef();
   const localScreen: any = useRef();
   const [numberParticipants, setNumberParticipants] = useState(1);
   const [isOpenMsgBox, setIsOpenMsgBox] = useState(false);
@@ -56,7 +67,12 @@ const CallingSection = ({
     dispatch(actions.currentMeetingChanged(channelDetail.id));
     return () => {
       dispatch(actions.currentMeetingChanged(null));
+      if (isConnected) {
+        isShareScreen && onStopScreenShare();
+        isStartStream && onStopUserVideo();
+      }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const numberRemote = Object.keys(remoteVideos).reduce(
@@ -98,6 +114,21 @@ const CallingSection = ({
   useEffect(() => {
     if (localVideoStream.current) {
       playVideo(localVideo.current, localVideoStream.current);
+      // ?.then(() => {
+      //   if (!sourceAudio.current) {
+      //     sourceAudio.current = ctx.createMediaStreamSource(
+      //       localVideoStream.current,
+      //     );
+      //     const streamDest = ctx.createMediaStreamDestination();
+      //     sourceAudio.current.connect(streamDest);
+      //     localAudioElement.srcObject = streamDest.stream;
+      //     // localAudioElement.volume = 1;
+      //     localAudioElement.play();
+      //   }
+      // })
+      // .catch((err: any) => {
+      //   console.error('media ERROR:', err);
+      // });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localVideoStream.current]);
@@ -111,22 +142,25 @@ const CallingSection = ({
   }, [localScreenStream.current, isShareScreen]);
 
   function pauseVideo(element: any) {
+    if (!element) return;
     element.pause();
     element.srcObject = null;
   }
 
   const onStopUserVideo = () => {
     pauseVideo(localVideo.current);
-    handleStopScreenShare();
   };
   const onStopScreenShare = () => {
     pauseVideo(localScreen.current);
-    handleStopScreenShare();
   };
 
   return (
     <>
-      <ChatBox isOpen={isOpenMsgBox} />
+      <ChatBox
+        isOpen={isOpenMsgBox}
+        messageList={messageList}
+        sendMessage={sendMsgCallBack}
+      />
       <Box
         position="relative"
         height="full"
@@ -165,9 +199,22 @@ const CallingSection = ({
             maxWidth="100%"
             maxHeight="80%"
             borderRadius="5px"
+            backgroundColor="gray.400"
             hidden={!isShareScreen}
+            pos="relative"
           >
             <video ref={localScreen} autoPlay />
+            <Box
+              position="absolute"
+              top="2"
+              left="2"
+              p="1"
+              backgroundColor="whiteAlpha.700"
+              borderRadius="5px"
+              // display="flex"
+            >
+              <Text mr={1}>{localUserInfo?.email}</Text>
+            </Box>
           </Box>
           {Object.keys(remoteVideos).map((key: any, index: number) => {
             return Object.keys(remoteVideos[key]).map(
@@ -209,6 +256,7 @@ const CallingSection = ({
           display="flex"
           justifyContent="center"
           alignItems="center"
+          backgroundColor="gray.400"
         >
           <video ref={localVideo} hidden={!isOnCam} />
           <Avatar
@@ -221,21 +269,11 @@ const CallingSection = ({
             top="2"
             left="2"
             p="1"
-            backgroundColor="whiteAlpha.900"
+            backgroundColor="whiteAlpha.700"
             borderRadius="5px"
+            // display="flex"
           >
-            <Text>{localUserInfo?.email}</Text>
-            {/* <AudioSpectrum
-              id="audio-canvas"
-              height={100}
-              width={50}
-              audioEle={localAudioElement}
-              capColor={'red'}
-              capHeight={1}
-              meterWidth={1}
-              meterCount={512}
-              gap={4}
-            /> */}
+            <Text mr={1}>{localUserInfo?.email}</Text>
           </Box>
         </Box>
         {/* TOP BAR ACTION */}
@@ -327,8 +365,8 @@ const CallingSection = ({
               className="active"
               onClick={() => {
                 handleEndCall();
-                onStopUserVideo();
-                onStopScreenShare();
+                // onStopUserVideo();
+                // onStopScreenShare();
               }}
             />
           </Box>

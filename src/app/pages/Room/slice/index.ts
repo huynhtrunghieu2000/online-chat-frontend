@@ -13,6 +13,7 @@ export const initialState: RoomState = {
   currentMeeting: null,
   isCreateRoomSuccess: false,
   isCreateChannelSuccess: false,
+  isInviteUserSuccess: false,
   isLoading: false,
   hasError: false,
   error: '',
@@ -220,6 +221,39 @@ const slice = createSlice({
       return {
         ...state,
         currentMeeting: action.payload,
+      };
+    },
+    inviteUserToRoom: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    },
+    inviteUserToRoomSuccess: state => {
+      return {
+        ...state,
+        isLoading: false,
+        error: null,
+        hasError: false,
+        isInviteUserSuccess: true,
+      };
+    },
+    inviteUserToRoomError: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+        hasError: true,
+        isInviteUserSuccess: false,
+      };
+    },
+    clearInviteUserToRoom: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isInviteUserSuccess: false,
+        hasError: true,
+        error: null,
       };
     },
   },
