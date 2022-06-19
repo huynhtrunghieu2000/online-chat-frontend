@@ -11,6 +11,9 @@ export const initialState: AuthSliceState = {
   isLoading: false,
   isError: false,
   errorMessage: '',
+  isUpdateProfileSuccess: false,
+  isRegisterSuccess: false,
+  isChangePasswordSuccess: false,
 };
 
 const slice = createSlice({
@@ -64,7 +67,7 @@ const slice = createSlice({
         ...state,
         isLoading: false,
         isError: true,
-        errorMessage: action.payload.message,
+        errorMessage: action.payload?.message,
       };
     },
     clearGetLoggedInUser(state) {
@@ -75,11 +78,48 @@ const slice = createSlice({
         errorMessage: '',
       };
     },
+    searchUser(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    },
+    searchUserSuccess(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        data: {
+          ...state.data,
+          userList: action.payload,
+        },
+      };
+    },
+    searchUserFailure(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMessage: action.payload?.message,
+      };
+    },
+    clearSearchUser(state) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMessage: '',
+        data: {
+          ...state.data,
+          userList: null,
+        },
+      };
+    },
     register(state, action: PayloadAction<any>) {
       return {
         ...state,
         isLoading: true,
         ...action.payload,
+        isRegisterSuccess: false,
       };
     },
     registerSuccess(state, action: PayloadAction<any>) {
@@ -87,14 +127,7 @@ const slice = createSlice({
         ...state,
         isLoading: false,
         data: action.payload,
-      };
-    },
-    clearRegister(state) {
-      return {
-        ...state,
-        isLoading: false,
-        isError: false,
-        errorMessage: '',
+        isRegisterSuccess: true,
       };
     },
     registerFailure(state, action: PayloadAction<any>) {
@@ -103,6 +136,84 @@ const slice = createSlice({
         isLoading: false,
         isError: true,
         errorMessage: action.payload.message,
+        isRegisterSuccess: false,
+      };
+    },
+    clearRegister(state) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMessage: '',
+        isRegisterSuccess: false,
+      };
+    },
+    changePassword(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: true,
+        isChangePasswordSuccess: false,
+      };
+    },
+    changePasswordSuccess(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isChangePasswordSuccess: true,
+      };
+    },
+    changePasswordFailure(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMessage: action.payload.message,
+        isChangePasswordSuccess: false,
+      };
+    },
+    clearChangePassword(state) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMessage: '',
+        isChangePasswordSuccess: false,
+      };
+    },
+    updateProfile(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: true,
+        isUpdateProfileSuccess: false,
+      };
+    },
+    updateProfileSuccess(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isUpdateProfileSuccess: true,
+        data: {
+          ...state.data,
+          user: { ...state.data.user, ...action.payload.result },
+        },
+      };
+    },
+    updateProfileFailure(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isUpdateProfileSuccess: false,
+        isError: true,
+        errorMessage: action.payload.message,
+      };
+    },
+    clearUpdateProfile(state) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMessage: '',
+        isUpdateProfileSuccess: false,
       };
     },
     registerVerify(state, action: PayloadAction<any>) {

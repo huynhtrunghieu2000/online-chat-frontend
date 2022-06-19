@@ -3,10 +3,7 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
-  ModalCloseButton,
-  Button,
 } from '@chakra-ui/react';
 import React, { useCallback } from 'react';
 
@@ -14,10 +11,12 @@ export interface DialogProps {
   content: React.ReactNode;
   title: string;
   onClose: () => void;
+  size?: string;
 }
-const Dialog = ({ content, title, onClose }: DialogProps) => {
+const Dialog = ({ content, title, onClose, size }: DialogProps) => {
+  console.log(size)
   return (
-    <Modal isOpen={true} onClose={onClose}>
+    <Modal isOpen={true} onClose={onClose} size={size || 'md'}>
       <ModalOverlay />
       <ModalContent pb={4}>
         <ModalHeader>{title}</ModalHeader>
@@ -44,6 +43,7 @@ export const DialogProvider = ({ children }) => {
           content={dialog.content}
           title={dialog.title}
           onClose={dialog.onClose}
+          size={dialog.size}
         />
       )}
     </DialogContext.Provider>

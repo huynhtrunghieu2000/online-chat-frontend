@@ -26,10 +26,9 @@ import { Messenger } from './pages/Messenger/Loadable';
 import { Profile } from './pages/Profile/Loadable';
 import { Calendar } from './pages/Calendar/Loadable';
 import { Box } from '@chakra-ui/react';
-import { SocketProvider } from 'app/core/contexts/socket';
 import { Room } from './pages/Room';
 import { SocketClient } from './core/contexts/socket-client';
-import AvatarUpload from './pages/Profile/components/AvatarUpload';
+import ChangePassword from './pages/Auth/containers/ChangePassword';
 
 export function App() {
   const { i18n } = useTranslation();
@@ -40,11 +39,9 @@ export function App() {
     (state: RootState) => state.authSlice?.data?.user,
   );
 
-  React.useEffect(() => {
-    if (!SocketClient.getInstance()) {
-      new SocketClient();
-    }
-  }, []);
+  if (!SocketClient.getInstance()) {
+    new SocketClient();
+  }
 
   React.useEffect(() => {
     if (!userData?.id && getToken()) {
@@ -72,14 +69,18 @@ export function App() {
       ></Helmet>
       <Box display="flex" flexDir="column" w="full" h="full" pos="fixed">
         <NavigationBar />
-        <AvatarUpload />
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/auth" component={Auth} />
           <PrivateRoute path="/dashboard" component={Dashboard} />
           <PrivateRoute path="/messenger" component={Messenger} />
           <PrivateRoute path="/rooms" component={Room} />
-          <PrivateRoute path="/profile" component={Profile} />
+          <PrivateRoute exact path="/profile" component={Profile} />
+          <PrivateRoute
+            exact
+            path={`/profile/change-password`}
+            component={ChangePassword}
+          />
           <PrivateRoute path="/calendar" component={Calendar} />
 
           <Route path="/404" component={NotFoundPage} />

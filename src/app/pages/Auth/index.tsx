@@ -26,9 +26,9 @@ import Register from './containers/Register';
 import RegisterVerify from './containers/RegisterVerify';
 import { messages } from './messages';
 import { useAuthSliceSlice } from './slice';
+import ChangePassword from './containers/ChangePassword';
 
 export function Auth() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { path } = useRouteMatch();
   const history = useHistory();
   const fromPath = useLocation<{ from: { pathname: 'path' } }>()?.state?.from;
@@ -44,7 +44,7 @@ export function Auth() {
     if (userData?.id) {
       if (fromPath) {
         history.push(fromPath.pathname);
-      } else history.push('/dashboard');
+      } else history.push('/rooms');
     } else if (!userData?.id && getToken()) {
       dispatch(actions.getLoggedInUser());
     } else if (!userData?.id && !getToken()) {

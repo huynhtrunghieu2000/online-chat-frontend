@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -20,8 +20,9 @@ import { APP_NAME } from 'app/core/constants/general';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAuthSliceSlice } from '../slice';
+import { RootState } from 'types';
 
 function Register() {
   const { t, i18n } = useTranslation();
@@ -35,6 +36,9 @@ function Register() {
     formState: { errors, isSubmitting },
   } = useForm();
   const [isShowPassword, setIsShowPassword] = useState(false);
+  const isRegisterSuccess = useSelector(
+    (state: RootState) => state.authSlice?.isRegisterSuccess,
+  );
   const registerFields = [
     {
       name: 'email',
@@ -79,6 +83,13 @@ function Register() {
   const onSubmit = params => {
     dispatch(actions.register(params));
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(actions.clearRegister());
+    };
+  }, []);
+
   return (
     <Box>
       <Helmet>
@@ -87,71 +98,83 @@ function Register() {
 
       <Center w="full" mt={24} flexDirection="column">
         {/* <Image src={LogoImage} w={20} h={20} mb={5} /> */}
-        <Text fontSize="3xl" fontWeight="extrabold" lineHeight={1.2}>
-          Welcome to {APP_NAME}
-        </Text>
-        <Text fontSize="3xl" fontWeight="extrabold" lineHeight={1.2} mb={5}>
-          Register to getting started
-        </Text>
-        <Text fontSize="sm" fontWeight="light" lineHeight={1.2}>
-          Tell us some details about you
-        </Text>
-        <Box as="form" w="96" p={5} mt={5} onSubmit={handleSubmit(onSubmit)}>
-          {registerFields.map(field => (
-            <FormControl
-              mb={3}
-              key={field.label}
-              isInvalid={errors[field.name]}
+        {!isRegisterSuccess ? (
+          <>
+            <Text fontSize="3xl" fontWeight="extrabold" lineHeight={1.2}>
+              Welcome to {APP_NAME}
+            </Text>
+            <Text fontSize="3xl" fontWeight="extrabold" lineHeight={1.2} mb={5}>
+              Register to getting started
+            </Text>
+            <Text fontSize="sm" fontWeight="light" lineHeight={1.2}>
+              Tell us some details about you
+            </Text>
+            <Box
+              as="form"
+              w="96"
+              p={5}
+              mt={5}
+              onSubmit={handleSubmit(onSubmit)}
             >
-              <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-              {field.type === 'password' ? (
-                <InputGroup>
-                  <InputRightElement>
-                    <IconButton
-                      aria-label="Show password"
-                      isRound
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsShowPassword(!isShowPassword)}
-                      _focusVisible={{ outline: 'none' }}
-                      tabIndex={-1}
-                    >
-                      <Icon
-                        color="gray.500"
-                        as={isShowPassword ? ViewIcon : ViewOffIcon}
+              {registerFields.map(field => (
+                <FormControl
+                  mb={3}
+                  key={field.label}
+                  isInvalid={errors[field.name]}
+                >
+                  <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
+                  {field.type === 'password' ? (
+                    <InputGroup>
+                      <InputRightElement>
+                        <IconButton
+                          aria-label="Show password"
+                          isRound
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setIsShowPassword(!isShowPassword)}
+                          _focusVisible={{ outline: 'none' }}
+                          tabIndex={-1}
+                        >
+                          <Icon
+                            color="gray.500"
+                            as={isShowPassword ? ViewIcon : ViewOffIcon}
+                          />
+                        </IconButton>
+                      </InputRightElement>
+                      <Input
+                        id={field.name}
+                        placeholder={field.placeholder}
+                        type={isShowPassword ? 'text' : 'password'}
+                        {...register(field.name, field.validation)}
                       />
-                    </IconButton>
-                  </InputRightElement>
-                  <Input
-                    id={field.name}
-                    placeholder={field.placeholder}
-                    type={isShowPassword ? 'text' : 'password'}
-                    {...register(field.name, field.validation)}
-                  />
-                </InputGroup>
-              ) : (
-                <Input
-                  id={field.name}
-                  placeholder={field.placeholder}
-                  type={field.type}
-                  {...register(field.name, field.validation)}
-                />
-              )}
-              <FormErrorMessage fontSize="sm">
-                {errors[field.name] ? errors[field.name].message : ''}
-              </FormErrorMessage>
-            </FormControl>
-          ))}
-          <Button
-            mt={4}
-            isFullWidth
-            colorScheme="purple"
-            isLoading={isSubmitting}
-            type="submit"
-          >
-            Register
-          </Button>
-        </Box>
+                    </InputGroup>
+                  ) : (
+                    <Input
+                      id={field.name}
+                      placeholder={field.placeholder}
+                      type={field.type}
+                      {...register(field.name, field.validation)}
+                    />
+                  )}
+                  <FormErrorMessage fontSize="sm">
+                    {errors[field.name] ? errors[field.name].message : ''}
+                  </FormErrorMessage>
+                </FormControl>
+              ))}
+              <Button
+                mt={4}
+                isFullWidth
+                colorScheme="purple"
+                isLoading={isSubmitting}
+                type="submit"
+              >
+                Register
+              </Button>
+            </Box>
+          </>
+        ) : (
+          <Text>Check your email to verify account</Text>
+        )}
       </Center>
     </Box>
   );

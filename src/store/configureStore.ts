@@ -8,12 +8,13 @@ import {
   StoreEnhancer,
 } from '@reduxjs/toolkit';
 import { createInjectorsEnhancer } from 'redux-injectors';
-import createSagaMiddleware from 'redux-saga';
+import createSagaMiddleware, { SagaMiddlewareOptions } from 'redux-saga';
 
 import { createReducer } from './reducers';
 
 export function configureAppStore() {
-  const reduxSagaMonitorOptions = {};
+  const reduxSagaMonitorOptions: SagaMiddlewareOptions = {
+  };
   const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions);
   const { run: runSaga } = sagaMiddleware;
 
@@ -29,7 +30,7 @@ export function configureAppStore() {
 
   const store = configureStore({
     reducer: createReducer(),
-    middleware: [...getDefaultMiddleware(), ...middlewares],
+    middleware: middlewares,
     devTools: process.env.NODE_ENV !== 'production',
     enhancers,
   });

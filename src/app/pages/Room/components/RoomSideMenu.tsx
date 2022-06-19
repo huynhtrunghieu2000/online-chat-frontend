@@ -166,6 +166,7 @@ const RoomSideMenu = memo((props: Props) => {
                   _focus={{ outline: 'none' }}
                 >
                   <Avatar
+                    src={room?.avatar}
                     name={room.name}
                     size={isOpen ? 'xs' : 'sm'}
                     mr={2}

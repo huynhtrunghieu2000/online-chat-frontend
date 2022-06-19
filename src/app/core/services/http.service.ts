@@ -39,7 +39,7 @@ axiosInstance.interceptors.request.use(config => {
 
 // For Response Interceptor
 axiosInstance.interceptors.response.use(
-  response => response.data,
+  response => response?.data,
   (error: AxiosError) => {
     if (axios.isCancel(error)) {
       console.log('Request canceled', error.message);
@@ -54,7 +54,7 @@ export default class HTTPService {
       axiosInstance
         .get(url, { params: params })
         .then(response => resolve(response))
-        .catch(error => reject(error.response.data));
+        .catch(error => reject(error.response));
     });
   }
 

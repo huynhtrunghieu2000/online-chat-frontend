@@ -50,11 +50,11 @@ export const NavigationBar = memo((props: Props) => {
       path: '/rooms',
       icon: MeetingRoom,
     },
-    {
-      name: 'Messenger',
-      path: '/messenger',
-      icon: Forum,
-    },
+    // {
+    //   name: 'Messenger',
+    //   path: '/messenger',
+    //   icon: Forum,
+    // },
     {
       name: 'Calendar',
       path: '/calendar',
@@ -118,7 +118,7 @@ export const NavigationBar = memo((props: Props) => {
             <Button mr={2} onClick={handleLogout}>
               Log out
             </Button>
-            <Avatar colorScheme="purple" size="md" name={userData.email} />
+            <Avatar colorScheme="purple" size="md" src={userData?.avatar} name={userData.email} />
           </>
         )}
       </Box>

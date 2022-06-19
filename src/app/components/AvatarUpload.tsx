@@ -2,14 +2,20 @@ import React from 'react';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import { storage } from 'app/core/services/firebase.service';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import { Avatar, Box, Button } from '@chakra-ui/react';
+import { Avatar, Box, Button, useToast } from '@chakra-ui/react';
 
 interface Props {
   initAvatar?: string;
   name?: string;
+  saveCallback: (data: any) => void;
 }
 const AvatarUpload = (props: Props) => {
+  const toast = useToast();
+
   const [images, setImages] = React.useState([]);
+  const [isUploadSuccess, setIsUploadSuccess] = React.useState(false);
+  const [uploadProgress, setUploadProgress] = React.useState(0);
+
   const maxNumber = 1;
 
   const onChange = (
@@ -27,11 +33,13 @@ const AvatarUpload = (props: Props) => {
 
     const storageRef = ref(storage, `avatar/${fileToUpload.lastModified}`);
     const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
+    setUploadProgress(10);
     uploadTask.on(
       'state_changed',
       snapshot => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(parseInt(progress.toString(), 10));
         console.log('Upload is ' + progress + '% done');
         switch (snapshot.state) {
           case 'paused':
@@ -49,7 +57,17 @@ const AvatarUpload = (props: Props) => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
-          console.log('File available at', downloadURL);
+          props.saveCallback({ avatar: downloadURL });
+          console.log('File available at', { avatar: downloadURL });
+          setIsUploadSuccess(true);
+          toast({
+            title: 'Update avatar success',
+            // description: 'Your avatar',
+            status: 'success',
+            duration: 2000,
+          });
+          setUploadProgress(0);
+          setImages([]);
         });
       },
     );
@@ -68,10 +86,16 @@ const AvatarUpload = (props: Props) => {
           dragProps,
         }) => (
           // write your building UI
-          <Box className="upload__image-wrapper">
+          <Box
+            className="upload__image-wrapper"
+            px={10}
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+          >
             <Avatar
               name={props.name || 'avatar'}
-              src={props.initAvatar || imageList[0]?.dataURL}
+              src={imageList[0]?.dataURL || props.initAvatar}
               size="2xl"
               style={isDragging ? { filter: 'brightness(0.8)' } : undefined}
               onClick={
@@ -79,20 +103,39 @@ const AvatarUpload = (props: Props) => {
               }
               _hover={{
                 cursor: 'pointer',
-                filter: 'brightness(0.8)',
+                _before: {
+                  content: '"Update"',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  position: 'absolute',
+                  pt: '50%',
+                  color: 'white',
+                  height: '100%',
+                  width: '100%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  borderRadius: '50%',
+                },
               }}
               {...dragProps}
             />
             {imageList[0]?.dataURL && (
-              <Box>
+              <Box
+                display="flex"
+                flexDir="column"
+                height={62}
+                mt={2}
+                width="100%"
+              >
                 <Button
                   variant="solid"
                   colorScheme="purple"
                   onClick={() => onUploadImageToStorage(imageList[0])}
+                  flex={1}
+                  mb={2}
                 >
-                  Save
+                  {uploadProgress > 0 ? `${uploadProgress}%` : 'Save'}
                 </Button>
-                <Button variant="solid" onClick={onImageRemoveAll}>
+                <Button variant="solid" onClick={onImageRemoveAll} flex={1}>
                   Cancel
                 </Button>
               </Box>

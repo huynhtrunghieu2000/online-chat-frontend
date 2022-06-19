@@ -47,15 +47,15 @@ const MessageEditor = (props: Props) => {
           '.w-md-editor-text-input': {
             borderColor: 'transparent !important',
             // p: 5,
-            fontSize: 'md',
-            fontFamily: 'body',
+            // fontSize: 'md',
+            // fontFamily: 'body',
           },
           '.wmde-markdown, .wmde-markdown-var': {
             '--color-border-default': 'transparent',
           },
-          'language-markdown code-highlight ': {
-            fontSize: 'md',
-          },
+          // 'language-markdown code-highlight ': {
+          //   fontSize: 'md',
+          // },
         }}
       >
         <MDEditor
@@ -69,21 +69,23 @@ const MessageEditor = (props: Props) => {
           toolbarHeight={40}
           visiableDragbar={false}
           hideToolbar={true}
+          highlightEnable={true}
         />
       </Box>
       <IconButton
         position="absolute"
         right={8}
+        p={1}
         top={'50%'}
         transform="translateY(-50%)"
         aria-label="send message"
         isRound={true}
-        bgColor="green.400"
+        bgColor="purple.500"
         size="sm"
         onClick={() => props.onSubmit(message)}
-        _hover={{ bgColor: 'green.300' }}
+        _hover={{ bgColor: 'purple.600' }}
       >
-        <Icon as={Send} boxSize={5} />
+        <Icon as={Send} boxSize={5} color="white" />
       </IconButton>
     </Box>
   );

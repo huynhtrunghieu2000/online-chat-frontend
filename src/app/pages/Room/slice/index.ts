@@ -12,8 +12,14 @@ export const initialState: RoomState = {
   messages: [],
   currentMeeting: null,
   isCreateRoomSuccess: false,
-  isCreateChannelSuccess: false,
+  isUpdateRoomDetailSuccess: false,
+  isLeaveRoomSuccess: false,
   isInviteUserSuccess: false,
+  isRemoveMemberSuccess: false,
+  isUpdateRoleMemberSuccess: false,
+  isCreateChannelSuccess: false,
+  isUpdateChannelSuccess: false,
+  isRemoveChannelSuccess: false,
   isLoading: false,
   hasError: false,
   error: '',
@@ -117,6 +123,157 @@ const slice = createSlice({
         roomDetail: undefined,
       };
     },
+    updateRoomDetail: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isUpdateRoomDetailSuccess: false,
+      };
+    },
+    updateRoomDetailSuccess: (state: RoomState, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        roomList: state.roomList.map(room =>
+          room.id === action.payload.id ? { ...room, ...action.payload } : room,
+        ),
+        roomDetail: {
+          ...state.roomDetail,
+          ...action.payload,
+        },
+        isUpdateRoomDetailSuccess: true,
+      };
+    },
+    updateRoomDetailFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+        isUpdateRoomDetailSuccess: false,
+      };
+    },
+    clearUpdateRoomDetail: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        isUpdateRoomDetailSuccess: false,
+      };
+    },
+    leaveRoom: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isLeaveRoomSuccess: false,
+      };
+    },
+    leaveRoomSuccess: (state: RoomState, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        roomList: state.roomList.filter(room => room.id !== action.payload),
+        roomDetail: null,
+        isLeaveRoomSuccess: true,
+      };
+    },
+    leaveRoomFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+        isLeaveRoomSuccess: false,
+      };
+    },
+    clearLeaveRoom: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        isLeaveRoomSuccess: false,
+      };
+    },
+    removeMember: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isRemoveMemberSuccess: false,
+      };
+    },
+    removeMemberSuccess: (state: RoomState, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        roomDetail: {
+          ...state.roomDetail,
+          Users: state.roomDetail.Users.filter(
+            user => user.id !== action.payload,
+          ),
+        },
+        isRemoveMemberSuccess: true,
+      };
+    },
+    removeMemberFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+        isRemoveMemberSuccess: false,
+      };
+    },
+    clearRemoveMember: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        isRemoveMemberSuccess: false,
+      };
+    },
+    updateRoleMember: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isUpdateRoleMemberSuccess: false,
+      };
+    },
+    updateRoleMemberSuccess: (state: RoomState, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        roomDetail: {
+          ...state.roomDetail,
+          Users: state.roomDetail.Users.map(user =>
+            user.id !== action.payload.user_id
+              ? user
+              : { ...user, ClassroomMember: { role: action.payload.role } },
+          ),
+        },
+        isUpdateRoleMemberSuccess: true,
+      };
+    },
+    updateRoleMemberFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+        isUpdateRoleMemberSuccess: false,
+      };
+    },
+    clearUpdateRoleMember: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        isUpdateRoleMemberSuccess: false,
+      };
+    },
     getChannelDetail: (state, action: PayloadAction<any>) => {
       return {
         ...state,
@@ -183,6 +340,89 @@ const slice = createSlice({
         isCreateChannelSuccess: false,
       };
     },
+    updateChannel: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isUpdateChannelSuccess: false,
+      };
+    },
+    updateChannelSuccess: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        channelDetail: {
+          ...state.channelDetail,
+          ...action.payload,
+        },
+        roomDetail: {
+          ...state.roomDetail,
+          Channels: state.roomDetail?.Channels.map(channel =>
+            channel.id === +action.payload.id
+              ? { ...channel, ...action.payload }
+              : channel,
+          ),
+        },
+        isUpdateChannelSuccess: true,
+      };
+    },
+    updateChannelFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+        isUpdateChannelSuccess: false,
+      };
+    },
+    clearUpdateChannel: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        isUpdateChannelSuccess: false,
+      };
+    },
+    removeChannel: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isRemoveChannelSuccess: false,
+      };
+    },
+    removeChannelSuccess: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        channelDetail: null,
+        roomDetail: {
+          ...state.roomDetail,
+          Channels: state.roomDetail?.Channels.filter(
+            channel => channel.id !== action.payload,
+          ),
+        },
+        isRemoveChannelSuccess: true,
+      };
+    },
+    removeChannelFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+        isRemoveChannelSuccess: false,
+      };
+    },
+    clearRemoveChannel: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        isRemoveChannelSuccess: false,
+      };
+    },
     sendMessageChannel: (state, action: PayloadAction<any>) => {
       const newMessage = {
         ...action.payload,
@@ -229,13 +469,14 @@ const slice = createSlice({
         isLoading: true,
       };
     },
-    inviteUserToRoomSuccess: state => {
+    inviteUserToRoomSuccess: (state, action: PayloadAction<any>) => {
       return {
         ...state,
         isLoading: false,
         error: null,
         hasError: false,
         isInviteUserSuccess: true,
+        roomDetail: action.payload,
       };
     },
     inviteUserToRoomError: (state, action: PayloadAction<any>) => {
@@ -247,13 +488,24 @@ const slice = createSlice({
         isInviteUserSuccess: false,
       };
     },
-    clearInviteUserToRoom: (state, action: PayloadAction<any>) => {
+    clearInviteUserToRoom: state => {
       return {
         ...state,
         isLoading: true,
         isInviteUserSuccess: false,
         hasError: true,
         error: null,
+      };
+    },
+    updateUserJoiningInRoom: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        roomDetail: {
+          ...state.roomDetail,
+          Channels: state.roomDetail.Channels.map(
+            channel => (channel.users = action.payload),
+          ),
+        },
       };
     },
   },

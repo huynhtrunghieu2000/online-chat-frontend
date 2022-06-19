@@ -26,24 +26,6 @@ const disconnectSocket = () => {
   });
 };
 
-// const disconnectListener = () => {
-//   socket = io(socketServerURL);
-//   return new Promise(resolve => {
-//     socket.on('disconnect', () => {
-//       resolve(socket);
-//     });
-//   });
-// };
-
-// const reconnectListener = () => {
-//   socket = io(socketServerURL);
-//   return new Promise(resolve => {
-//     socket.on('reconnect', () => {
-//       resolve(socket);
-//     });
-//   });
-// };
-
 function* login({ payload }) {
   try {
     const response = yield call(
@@ -62,7 +44,7 @@ function* login({ payload }) {
 
 function* getLoggedInUser() {
   try {
-    const response = yield call(HTTPService.get, API_ENDPOINT.user.index);
+    const response = yield call(HTTPService.get, API_ENDPOINT.user.me);
     yield call(connectSocket);
     yield put(actions.getLoggedInUserSuccess(response));
   } catch (error) {
@@ -82,6 +64,44 @@ function* register({ payload }) {
   } catch (error) {
     yield put(actions.registerFailure(error));
     removeToken();
+  }
+}
+
+function* changePassword({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.post,
+      API_ENDPOINT.user.changePassword,
+      payload,
+    );
+    yield put(actions.changePasswordSuccess(response));
+  } catch (error) {
+    yield put(actions.changePasswordFailure(error));
+  }
+}
+
+function* updateProfile({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.post,
+      API_ENDPOINT.user.updateProfile,
+      payload,
+    );
+    console.log(response);
+    yield put(actions.updateProfileSuccess(response));
+  } catch (error) {
+    yield put(actions.updateProfileFailure(error));
+  }
+}
+
+function* searchUser({ payload }) {
+  try {
+    const response = yield call(HTTPService.get, API_ENDPOINT.user.index, {
+      search: payload.search,
+    });
+    yield put(actions.searchUserSuccess(response));
+  } catch (error) {
+    yield put(actions.searchUserFailure(error));
   }
 }
 
@@ -110,7 +130,10 @@ function* logout() {
 export function* authSliceSaga() {
   yield takeLatest(actions.login, login);
   yield takeLatest(actions.register, register);
+  yield takeLatest(actions.updateProfile, updateProfile);
   yield takeLatest(actions.registerVerify, registerVerify);
   yield takeLatest(actions.getLoggedInUser, getLoggedInUser);
+  yield takeLatest(actions.searchUser, searchUser);
   yield takeLatest(actions.logout, logout);
+  yield takeLatest(actions.changePassword, changePassword);
 }

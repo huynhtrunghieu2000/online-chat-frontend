@@ -2,14 +2,30 @@ import React, { Suspense, lazy, forwardRef } from 'react';
 import { Device } from 'mediasoup-client';
 import { io, Socket } from 'socket.io-client';
 import { API_URL } from 'app/config';
-import { Avatar, Box, Button, Switch, useToast } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  Button,
+  Icon,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Switch,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
 import { SocketClient } from 'app/core/contexts/socket-client';
 import VideoClientMeet from 'app/components/VideoClientMeet';
 import CallingSection from './CallingSection';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'types';
 import { getToken } from 'app/core/services/storage.service';
-import { Prompt } from 'react-router-dom';
+import { Prompt, useHistory } from 'react-router-dom';
+import { useRoomSlice } from '../../slice';
+import { UpdateChannelInfoDialog } from '../ChannelText';
+import { useDialog } from 'app/components/Dialog/Dialog';
+import { Abc, MoreVert, Videocam } from '@mui/icons-material';
 // import { config } from '@app/core/config';
 
 const MODE_STREAM = 'stream';
@@ -292,7 +308,7 @@ function MeetRoom({ roomId }) {
       console.warn('NO tracks');
       return;
     }
-
+    console.log('stop user media tracks', tracks);
     tracks.forEach((track: any) => track.stop());
   }
 
@@ -898,9 +914,82 @@ function MeetRoom({ roomId }) {
     if (!isStartMedia) handleStartMedia();
 
     return () => {
+      console.log('getout');
       handleDisconnect();
     };
   }, []);
+
+  // Channel manage
+  const dialog = useDialog();
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const { actions } = useRoomSlice();
+  const currentRoom = useSelector((state: RootState) => state.room?.roomDetail);
+  const channel = useSelector((state: RootState) => state.room?.channelDetail);
+  const isUpdateChannelSuccess = useSelector(
+    (state: RootState) => state?.room?.isUpdateChannelSuccess,
+  );
+  const isRemoveChannelSuccess = useSelector(
+    (state: RootState) => state?.room?.isRemoveChannelSuccess,
+  );
+
+  const handleChangeName = () => {
+    const onChangeName = name => {
+      const data = {
+        id: roomId,
+        name,
+      };
+      console.log(data);
+      dispatch(actions.updateChannel(data));
+    };
+
+    dialog.setDialog({
+      title: 'Change name',
+      content: <UpdateChannelInfoDialog onClose={onChangeName} />,
+      onClose: dialog.setDialog(null),
+      // size: '2xl',
+    });
+  };
+  const handleRemoveChannel = id => {
+    const data = {
+      id,
+    };
+    dispatch(actions.removeChannel(data));
+  };
+  const menuList = id => [
+    {
+      title: 'Change channel name',
+      func: () => handleChangeName(),
+    },
+    {
+      title: 'Remove channel',
+      func: () => handleRemoveChannel(id),
+      color: 'red.500',
+    },
+  ];
+  React.useEffect(() => {
+    if (isUpdateChannelSuccess) {
+      toast({
+        title: 'Update channel success',
+        status: 'success',
+        duration: 2000,
+      });
+      dispatch(actions.clearUpdateChannel());
+    }
+  }, [isUpdateChannelSuccess]);
+
+  React.useEffect(() => {
+    if (isRemoveChannelSuccess) {
+      console.log('removed');
+      toast({
+        title: 'Remove channel success',
+        status: 'success',
+        duration: 2000,
+      });
+      history.replace(`/rooms/${currentRoom.id}`);
+      dispatch(actions.clearRemoveChannel());
+    }
+  }, [isRemoveChannelSuccess]);
 
   const userScreenShare = navigator.mediaDevices.addEventListener(
     'devicechange',
@@ -908,9 +997,13 @@ function MeetRoom({ roomId }) {
       console.log('devicechange', e);
     },
   );
+  const channelTypeIcon = {
+    text: Abc,
+    video: Videocam,
+  };
 
   return (
-    <Box display="flex" justifyContent="center" height="full">
+    <Box display="flex" height="full" flexDir="column">
       <Prompt
         when={isConnected}
         message={(location, action) => {
@@ -920,60 +1013,96 @@ function MeetRoom({ roomId }) {
         }}
       />
       {!isConnected ? (
-        <Box pt={'32'}>
-          <video
-            ref={localVideo}
-            autoPlay
-            muted
-            style={{
-              width: '500px',
-              height: '400px',
-              borderRadius: '5px',
-              objectFit: 'cover',
-            }}
-          >
-            <Box backgroundColor="gray.600">
-              <Avatar name="Hieu" />
-            </Box>
-          </video>
+        <>
           <Box
-            bgColor={'white'}
-            color="gray.500"
-            p={2}
-            px={4}
+            width="100%"
+            backgroundColor="white"
+            p={3}
             display="flex"
-            alignItems="center"
             justifyContent="space-between"
-            borderRadius={4}
           >
-            <Box display="flex" alignItems="center" flexDir="column">
-              <Switch
-                colorScheme="purple"
-                onChange={handleMuteVideo}
-                isChecked={isOnCam}
+            <Box display="flex">
+              <Icon
+                as={channelTypeIcon[channel?.type]}
+                color="gray.500"
+                mr={2}
               />
-              <label>Video</label>
+              <Text fontWeight="bold">{channel?.name}</Text>
             </Box>
-            <Box ml={2} display="flex" alignItems="center" flexDir="column">
-              <Switch
-                colorScheme="purple"
-                onChange={handleMuteAudio}
-                isChecked={isOnMic}
-              />
-              <label>Audio</label>
-            </Box>
-            <Button
-              ml={3}
-              colorScheme="purple"
-              isFullWidth={true}
-              disabled={isConnected || !isStartMedia}
-              onClick={handleConnect}
-              isLoading={isLoading}
-            >
-              Join
-            </Button>
+            <Menu>
+              <MenuButton aria-label="Classroom options">
+                <Icon as={MoreVert} color="gray.500" />
+              </MenuButton>
+              <MenuList>
+                {menuList(roomId).map(item => (
+                  <MenuItem
+                    key={item.title}
+                    onClick={item.func}
+                    color={item.color}
+                  >
+                    {item.title}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
           </Box>
-        </Box>
+          <Box display="flex" justifyContent="center" height="full">
+            <Box pt={'32'}>
+              <video
+                ref={localVideo}
+                autoPlay
+                muted
+                style={{
+                  width: '500px',
+                  height: '400px',
+                  borderRadius: '5px',
+                  objectFit: 'cover',
+                }}
+              >
+                <Box backgroundColor="gray.600">
+                  <Avatar name="Hieu" />
+                </Box>
+              </video>
+              <Box
+                bgColor={'white'}
+                color="gray.500"
+                p={2}
+                px={4}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                borderRadius={4}
+              >
+                <Box display="flex" alignItems="center" flexDir="column">
+                  <Switch
+                    colorScheme="purple"
+                    onChange={handleMuteVideo}
+                    isChecked={isOnCam}
+                  />
+                  <label>Video</label>
+                </Box>
+                <Box ml={2} display="flex" alignItems="center" flexDir="column">
+                  <Switch
+                    colorScheme="purple"
+                    onChange={handleMuteAudio}
+                    isChecked={isOnMic}
+                  />
+                  <label>Audio</label>
+                </Box>
+                <Button
+                  ml={3}
+                  colorScheme="purple"
+                  isFullWidth={true}
+                  disabled={isConnected || !isStartMedia}
+                  onClick={handleConnect}
+                  isLoading={isLoading}
+                >
+                  Join
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </>
       ) : (
         <CallingSection
           localVideoStream={localStream}

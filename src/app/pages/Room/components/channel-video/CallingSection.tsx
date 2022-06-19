@@ -256,9 +256,10 @@ const CallingSection = ({
         >
           <video ref={localVideo} hidden={!isOnCam} />
           <Avatar
+            src={localUserInfo?.avatar}
             name={localUserInfo?.email}
             hidden={isOnCam}
-            size={numberParticipants === 1 ? '2xl' : 'md'}
+            size={numberParticipants === 1 ? '2xl' : 'lg'}
           />
           <Box
             position="absolute"

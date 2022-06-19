@@ -1,1 +1,1 @@
-export const APP_NAME = 'Video Conference';
+export const APP_NAME = 'Online Meeting';

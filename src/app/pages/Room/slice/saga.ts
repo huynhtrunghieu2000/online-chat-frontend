@@ -20,6 +20,8 @@ import { SOCKET_EVENT } from 'app/core/constants/socket-actionTypes';
 import { format } from 'path';
 import { Socket } from 'socket.io-client';
 
+const socketSevice =
+  SocketClient.getInstance()?.Socket || new SocketClient().Socket;
 function* getRoomList() {
   try {
     const response = yield call(HTTPService.get, API_ENDPOINT.room.index, {});
@@ -36,9 +38,64 @@ function* getRoomDetail({ payload }) {
       `${API_ENDPOINT.room.index}/${payload.id}`,
       {},
     );
+    console.log(response);
     yield put(actions.getRoomDetailSuccess(response));
   } catch (error) {
     yield put(actions.getRoomDetailFailure(error));
+  }
+}
+
+function* updateRoomDetail({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.put,
+      `${API_ENDPOINT.room.index}/${payload.id}`,
+      payload,
+    );
+    yield put(actions.updateRoomDetailSuccess(response));
+  } catch (error) {
+    yield put(actions.updateRoomDetailFailure(error));
+  }
+}
+
+function* leaveRoom({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.delete,
+      `${API_ENDPOINT.room.index}/${payload.id}/member`,
+      payload,
+    );
+    console.log(response);
+    yield put(actions.leaveRoomSuccess(response));
+  } catch (error) {
+    yield put(actions.leaveRoomFailure(error));
+  }
+}
+
+function* removeMember({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.delete,
+      `${API_ENDPOINT.room.index}/${payload.id}/member`,
+      payload,
+    );
+    console.log(response);
+    yield put(actions.removeMemberSuccess(payload.user_id));
+  } catch (error) {
+    yield put(actions.removeMemberFailure(error));
+  }
+}
+
+function* updateRoleMember({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.put,
+      `${API_ENDPOINT.room.index}/${payload.id}/member`,
+      payload,
+    );
+    yield put(actions.updateRoleMemberSuccess(payload));
+  } catch (error) {
+    yield put(actions.updateRoleMemberFailure(error));
   }
 }
 
@@ -75,9 +132,38 @@ function* getChannelDetail({ payload }) {
       `${API_ENDPOINT.channel.index}/${idChannel}`,
       {},
     );
+    socketSevice.emit(SOCKET_EVENT.CHANNEL.JOIN, idChannel, (data: any) => {
+      console.log(data);
+    });
     yield put(actions.getChannelDetailSuccess(response));
   } catch (error) {
     yield put(actions.getChannelDetailFailure(error));
+  }
+}
+
+function* updateChannel({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.put,
+      `${API_ENDPOINT.channel.index}/${payload.id}`,
+      payload,
+    );
+    yield put(actions.updateChannelSuccess(response));
+  } catch (error) {
+    yield put(actions.updateChannelFailure(error));
+  }
+}
+
+function* removeChannel({ payload }) {
+  try {
+    yield call(
+      HTTPService.delete,
+      `${API_ENDPOINT.channel.index}/${payload.id}`,
+      payload,
+    );
+    yield put(actions.removeChannelSuccess(payload.id));
+  } catch (error) {
+    yield put(actions.removeChannelFailure(error));
   }
 }
 
@@ -117,11 +203,11 @@ function* inviteUserToRoom({ payload }) {
     };
     const response = yield call(
       HTTPService.post,
-      `${API_ENDPOINT.room.index}/${payload.roomId}/invite`,
+      `${API_ENDPOINT.room.index}/${payload.roomId}/member`,
       data,
     );
 
-    yield put(actions.inviteUserToRoomSuccess());
+    yield put(actions.inviteUserToRoomSuccess(response));
   } catch (error) {
     yield put(actions.inviteUserToRoomError(error));
   }
@@ -141,6 +227,7 @@ function* inviteUserToRoom({ payload }) {
 const subscribeSocketChannel = (socket: Socket) => {
   return eventChannel(emit => {
     socket.on(SOCKET_EVENT.CHANNEL.NEW_MESSAGE, data => {
+      console.log('newmsg', data);
       emit(actions.newMessageChannelReceived(data));
     });
     socket.on('new-producer', ({ producerId }) => {
@@ -149,7 +236,8 @@ const subscribeSocketChannel = (socket: Socket) => {
     socket.on('producer-closed', ({ remoteProducerId }) => {
       emit(actions.currentMeetingChanged(remoteProducerId));
     });
-    socket.on('ChannelUserActiveChanged', data => {});
+    socket.on('channel:userJoin', data => {});
+    socket.on('channel:userLeave', data => {});
     // This will listen to socket and emit Action when it receives socket event
     // Unsubscribe
     return () => {};
@@ -175,15 +263,15 @@ function* sendMessageChannel(socket: Socket) {
 }
 
 function* joinRoom(socket) {
-  while (true) {
-    const { payload } = yield take(actions.getChannelDetail);
-    let roomId = 0;
-    socket.emit(SOCKET_EVENT.CHANNEL.JOIN, payload.idChannel, (data: any) => {
-      roomId = data;
-    });
-    // yield put(actions.getRoomDetail(roomId));
-    // console.log(roomId);
-  }
+  // while (true) {
+  //   const { payload } = yield take(actions.getChannelDetail);
+  //   socket.emit(SOCKET_EVENT.CHANNEL.JOIN, payload.idChannel, (data: any) => {
+  //     // roomId = data;
+  //     console.log(data);
+  //   });
+  //   // yield put(actions.getRoomDetail(roomId));
+  //   // console.log(roomId);
+  // }
 }
 
 function* handleIO(socket) {
@@ -210,8 +298,14 @@ export function* roomSaga() {
   yield fork(flow);
   yield takeLatest(actions.getRoomList, getRoomList);
   yield takeLatest(actions.getRoomDetail, getRoomDetail);
+  yield takeLatest(actions.updateRoomDetail, updateRoomDetail);
   yield takeLatest(actions.createRoom, createRoom);
   yield takeLatest(actions.getChannelDetail, getChannelDetail);
   yield takeLatest(actions.createChannel, createChannel);
   yield takeLatest(actions.inviteUserToRoom, inviteUserToRoom);
+  yield takeLatest(actions.leaveRoom, leaveRoom);
+  yield takeLatest(actions.removeMember, removeMember);
+  yield takeLatest(actions.updateRoleMember, updateRoleMember);
+  yield takeLatest(actions.updateChannel, updateChannel);
+  yield takeLatest(actions.removeChannel, removeChannel);
 }

@@ -3,8 +3,11 @@
  * Messenger
  *
  */
+import { Box } from '@chakra-ui/react';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import MessengerContent from './components/MessengerContent';
+import MessengerSideBar from './components/MessengerSideBar';
 import { messages } from './messages';
 
 interface Props {}
@@ -14,10 +17,10 @@ const Messenger = (props: Props) => {
   const { t, i18n } = useTranslation();
 
   return (
-    <div>
-      {t('')}
-      {/*  {t(...messages.someThing())}  */}
-    </div>
+    <Box display="flex" height="full">
+      <MessengerSideBar />
+      <MessengerContent />
+    </Box>
   );
 };
 

@@ -4,4 +4,7 @@ export interface AuthSliceState {
   isLoading: boolean;
   isError: boolean;
   errorMessage: string;
+  isUpdateProfileSuccess: boolean;
+  isRegisterSuccess: boolean;
+  isChangePasswordSuccess: boolean;
 }
