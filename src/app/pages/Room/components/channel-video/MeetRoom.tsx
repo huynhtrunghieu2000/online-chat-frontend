@@ -881,9 +881,9 @@ function MeetRoom({ roomId }) {
   };
 
   const [messageList, setMessageList] = React.useState<any[]>([]);
-  const sendMessage = (message: string) => {
+  const sendMessage = (message) => {
     sendRequest('sendMessage', {
-      message,
+      ...message,
       userInfo: localUserInfo,
     })
       .then(res => {

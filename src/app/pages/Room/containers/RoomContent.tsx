@@ -38,7 +38,7 @@ const RoomContent = () => {
     if (!room?.roomDetail && room?.hasError && !room.isLoading) {
       toast({
         title: 'Error',
-        description: room?.error.message,
+        description: room?.error?.message,
         status: 'error',
       });
 

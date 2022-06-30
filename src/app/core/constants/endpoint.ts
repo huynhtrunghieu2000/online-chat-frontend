@@ -10,6 +10,7 @@ export const API_ENDPOINT = {
     forgotPassword: '/user/forgot_password',
     forgotPasswordVerify: '/user/forgot_password/verify/:token',
     resetPassword: '/user/reset_password',
+    notification: '/user/notification',
   },
   room: {
     index: '/classrooms',

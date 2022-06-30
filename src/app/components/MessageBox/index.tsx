@@ -1,8 +1,9 @@
-import { Box, Avatar, Text } from '@chakra-ui/react';
+import { Box, Avatar, Text, Image } from '@chakra-ui/react';
 import moment from 'moment';
 import React, { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { messages } from './messages';
+import AttachmentComponent from './AttachmentComponent';
 
 interface Props {
   messageList: any[];
@@ -13,9 +14,17 @@ interface Props {
 const MessageBox = memo(({ messageList, avatarSize, channelType }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t, i18n } = useTranslation();
+  const messageEnd = useRef<HTMLDivElement>(null);
+  const box = useRef<any>(null);
+  const scrollToBottom = () => {
+    if (messageEnd.current) messageEnd.current.scrollIntoView();
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messageList]);
 
   return (
-    <Box flex={1} width="full">
+    <Box flex={1} width="full" height="full" overflowY="scroll" ref={box}>
       {messageList.map((message, index) => (
         <Box
           key={index}
@@ -24,6 +33,11 @@ const MessageBox = memo(({ messageList, avatarSize, channelType }: Props) => {
           w="full"
           borderBottomColor="gray.200"
           borderBottomWidth={1}
+          _hover={{
+            backgroundColor: 'gray.300',
+            transition: 'all 0.2s',
+          }}
+          borderRadius={4}
         >
           <Box display="flex">
             <Avatar
@@ -54,10 +68,19 @@ const MessageBox = memo(({ messageList, avatarSize, channelType }: Props) => {
               <Text width={channelType === 'video' ? '210px' : 'full'}>
                 {message.message}
               </Text>
+              {message?.attachments?.length > 0
+                ? message?.attachments?.map(attachment => (
+                    <AttachmentComponent
+                      key={attachment.url}
+                      attachment={attachment}
+                    />
+                  ))
+                : ''}
             </Box>
           </Box>
         </Box>
       ))}
+      <Box ref={messageEnd}></Box>
     </Box>
   );
 });

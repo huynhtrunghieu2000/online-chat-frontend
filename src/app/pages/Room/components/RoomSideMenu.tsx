@@ -20,8 +20,9 @@ import {
   FormErrorMessage,
   Input,
   useToast,
+  Icon,
 } from '@chakra-ui/react';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import { AddCircle, ArrowBack, ArrowForward } from '@mui/icons-material';
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
@@ -64,6 +65,7 @@ const RoomSideMenu = memo((props: Props) => {
         status: 'success',
         duration: 2000,
       });
+      dispatch(actions.clearGetChannelDetail());
       dispatch(actions.clearCreateRoom());
     }
   }, [isCreateRoomSuccess]);
@@ -101,22 +103,7 @@ const RoomSideMenu = memo((props: Props) => {
       transition="all 0.3s"
       shadow="lg"
     >
-      <Box
-        p={2}
-        display="flex"
-        alignSelf="center"
-        w="full"
-        justifyContent="center"
-      >
-        <Button
-          w="full"
-          mr={2}
-          hidden={!isOpen}
-          transition="all 1s"
-          onClick={() => setIsOpenModal(true)}
-        >
-          + Create room
-        </Button>
+      <Box p={2} display="flex" alignSelf="flex-end" justifyContent="center">
         <IconButton
           aria-label="toggle list class"
           icon={isOpen ? <ArrowBack /> : <ArrowForward />}
@@ -128,6 +115,7 @@ const RoomSideMenu = memo((props: Props) => {
         variant="unstyled"
         index={tabIndex}
         onChange={handleTabChange}
+        overflowY="scroll"
       >
         <TabList w="full">
           {listRoom?.length ? (
@@ -179,6 +167,35 @@ const RoomSideMenu = memo((props: Props) => {
           ) : (
             <></>
           )}
+          <Tab
+            px={4}
+            py={4}
+            w="full"
+            display="flex"
+            alignItems="center"
+            pos="relative"
+            justifyContent="flex-start"
+            textOverflow="ellipsis"
+            transition="all 0.3s"
+            _hover={{ backgroundColor: 'gray.200' }}
+            _focus={{ outline: 'none' }}
+            onClick={() => setIsOpenModal(true)}
+          >
+            {isOpen ? (
+              <>
+                <Icon
+                  as={AddCircle}
+                  h={'24px'}
+                  w={'24px'}
+                  mr={2}
+                  color="purple.500"
+                />
+                <Text isTruncated>Create room</Text>
+              </>
+            ) : (
+              <Icon as={AddCircle} h={'32px'} w={'32px'} color="purple.500" />
+            )}
+          </Tab>
         </TabList>
       </Tabs>
       <CreateRoomDialog

@@ -20,6 +20,8 @@ export const initialState: RoomState = {
   isCreateChannelSuccess: false,
   isUpdateChannelSuccess: false,
   isRemoveChannelSuccess: false,
+  isCreateEventSuccess: false,
+  socketCondition: {},
   isLoading: false,
   hasError: false,
   error: '',
@@ -49,7 +51,7 @@ const slice = createSlice({
         ...state,
         isLoading: false,
         hasError: true,
-        error: action.payload.message,
+        error: action.payload,
       };
     },
     clearGetRoomList: state => {
@@ -424,16 +426,13 @@ const slice = createSlice({
       };
     },
     sendMessageChannel: (state, action: PayloadAction<any>) => {
-      const newMessage = {
-        ...action.payload,
-        createdAt: new Date().toISOString(),
-        isMine: true,
-        isSendSuccess: false,
-      };
+      console.log(
+        '🚀 ~ file: index.ts ~ line 428 ~ action.payload',
+        action.payload,
+      );
       return {
         ...state,
         isLoading: true,
-        messages: [...state.messages, newMessage],
       };
     },
     sendMessageChannelSuccess: (state, action: PayloadAction<any>) => {
@@ -452,6 +451,7 @@ const slice = createSlice({
       };
     },
     newMessageChannelReceived: (state, action: PayloadAction<any>) => {
+      console.log('new msg received', action);
       return {
         ...state,
         messages: [...state.messages, action.payload],
@@ -505,6 +505,113 @@ const slice = createSlice({
           Channels: state.roomDetail.Channels.map(
             channel => (channel.users = action.payload),
           ),
+        },
+      };
+    },
+    getRoomByInviteCode: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    },
+    getRoomByInviteCodeSuccess: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        roomDetail: action.payload,
+      };
+    },
+    getRoomByInviteCodeFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+      };
+    },
+    clearGetRoomByInviteCode: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        roomDetail: undefined,
+      };
+    },
+    joinRoomByInviteCode: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    },
+    joinRoomByInviteCodeSuccess: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        roomDetail: action.payload,
+      };
+    },
+    joinRoomByInviteCodeFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+      };
+    },
+    clearJoinRoomByInviteCode: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        roomDetail: undefined,
+      };
+    },
+    createRoomEvent: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isCreateEventSuccess: false,
+      };
+    },
+    createRoomEventSuccess: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        isCreateEventSuccess: true,
+        hasError: false,
+        error: '',
+        roomDetail: {
+          ...state.roomDetail,
+          Events: [...state.roomDetail.Events, action.payload],
+        },
+      };
+    },
+    createRoomEventFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isCreateEventSuccess: false,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+      };
+    },
+    clearCreateRoomEvent: state => {
+      return {
+        ...state,
+        isCreateEventSuccess: false,
+        isLoading: false,
+        hasError: false,
+        error: '',
+      };
+    },
+    socketDisconnected: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        socketCondition: {
+          isConnected: false,
+          message: action.payload,
         },
       };
     },

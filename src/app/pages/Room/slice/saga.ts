@@ -8,7 +8,6 @@ import {
   take,
   call,
   put,
-  select,
   takeLatest,
   cancel,
   fork,
@@ -20,7 +19,7 @@ import { SOCKET_EVENT } from 'app/core/constants/socket-actionTypes';
 import { format } from 'path';
 import { Socket } from 'socket.io-client';
 
-const socketSevice =
+const socketService =
   SocketClient.getInstance()?.Socket || new SocketClient().Socket;
 function* getRoomList() {
   try {
@@ -42,6 +41,31 @@ function* getRoomDetail({ payload }) {
     yield put(actions.getRoomDetailSuccess(response));
   } catch (error) {
     yield put(actions.getRoomDetailFailure(error));
+  }
+}
+function* getRoomByInviteCode({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.get,
+      `${API_ENDPOINT.room.index}/invite`,
+      payload,
+    );
+    yield put(actions.getRoomByInviteCodeSuccess(response));
+  } catch (error) {
+    yield put(actions.getRoomByInviteCodeFailure(error));
+  }
+}
+
+function* joinRoomByInviteCode({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.post,
+      `${API_ENDPOINT.room.index}/invite`,
+      payload,
+    );
+    yield put(actions.joinRoomByInviteCodeSuccess(response));
+  } catch (error) {
+    yield put(actions.joinRoomByInviteCodeFailure(error));
   }
 }
 
@@ -132,8 +156,8 @@ function* getChannelDetail({ payload }) {
       `${API_ENDPOINT.channel.index}/${idChannel}`,
       {},
     );
-    socketSevice.emit(SOCKET_EVENT.CHANNEL.JOIN, idChannel, (data: any) => {
-      console.log(data);
+    socketService.emit(SOCKET_EVENT.CHANNEL.JOIN, idChannel, (data: any) => {
+      console.log('joinSuccess');
     });
     yield put(actions.getChannelDetailSuccess(response));
   } catch (error) {
@@ -151,6 +175,19 @@ function* updateChannel({ payload }) {
     yield put(actions.updateChannelSuccess(response));
   } catch (error) {
     yield put(actions.updateChannelFailure(error));
+  }
+}
+
+function* createRoomEvent({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.post,
+      `${API_ENDPOINT.room.index}/${payload.id}/event`,
+      payload,
+    );
+    yield put(actions.createRoomEventSuccess(response));
+  } catch (error) {
+    yield put(actions.createRoomEventFailure(error));
   }
 }
 
@@ -227,8 +264,10 @@ function* inviteUserToRoom({ payload }) {
 const subscribeSocketChannel = (socket: Socket) => {
   return eventChannel(emit => {
     socket.on(SOCKET_EVENT.CHANNEL.NEW_MESSAGE, data => {
-      console.log('newmsg', data);
       emit(actions.newMessageChannelReceived(data));
+    });
+    socket.on('disconnected', () => {
+      emit(actions.socketDisconnected('Disconnected from server...'));
     });
     socket.on('new-producer', ({ producerId }) => {
       emit(actions.currentMeetingChanged(producerId));
@@ -238,6 +277,9 @@ const subscribeSocketChannel = (socket: Socket) => {
     });
     socket.on('channel:userJoin', data => {});
     socket.on('channel:userLeave', data => {});
+    socket.on('newNotification', data => {
+      emit(authSliceActions.receivedNewNotification(data));
+    });
     // This will listen to socket and emit Action when it receives socket event
     // Unsubscribe
     return () => {};
@@ -262,22 +304,9 @@ function* sendMessageChannel(socket: Socket) {
   }
 }
 
-function* joinRoom(socket) {
-  // while (true) {
-  //   const { payload } = yield take(actions.getChannelDetail);
-  //   socket.emit(SOCKET_EVENT.CHANNEL.JOIN, payload.idChannel, (data: any) => {
-  //     // roomId = data;
-  //     console.log(data);
-  //   });
-  //   // yield put(actions.getRoomDetail(roomId));
-  //   // console.log(roomId);
-  // }
-}
-
 function* handleIO(socket) {
   yield fork(read, socket);
   yield fork(sendMessageChannel, socket);
-  yield fork(joinRoom, socket);
 }
 
 function* flow() {
@@ -308,4 +337,7 @@ export function* roomSaga() {
   yield takeLatest(actions.updateRoleMember, updateRoleMember);
   yield takeLatest(actions.updateChannel, updateChannel);
   yield takeLatest(actions.removeChannel, removeChannel);
+  yield takeLatest(actions.getRoomByInviteCode, getRoomByInviteCode);
+  yield takeLatest(actions.joinRoomByInviteCode, joinRoomByInviteCode);
+  yield takeLatest(actions.createRoomEvent, createRoomEvent);
 }

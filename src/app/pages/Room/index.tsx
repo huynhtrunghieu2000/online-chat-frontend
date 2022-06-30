@@ -15,6 +15,7 @@ import RoomSideMenu from './components/RoomSideMenu';
 import RoomContent from './containers/RoomContent';
 import { useRoomSlice } from './slice';
 import RoomEntry from 'assets/images/room-get-in.svg';
+import { RootState } from 'types';
 interface Props {}
 
 export function Room(props: Props) {
@@ -23,6 +24,10 @@ export function Room(props: Props) {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { actions } = useRoomSlice();
+
+  const socketCondition = useSelector(
+    (state: RootState) => state.room?.socketCondition,
+  );
 
   useEffect(() => {
     dispatch(actions.getRoomList({}));

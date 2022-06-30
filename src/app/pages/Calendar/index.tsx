@@ -37,9 +37,6 @@ const Calendar = (props: Props) => {
   const events = useSelector(
     (state: RootState) => state.calendar?.events,
   ) as Event[];
-  const eventDetail = useSelector(
-    (state: RootState) => state.calendar?.eventDetail,
-  );
   const isLoading = useSelector(
     (state: RootState) => state.calendar?.isLoading,
   );
@@ -91,14 +88,7 @@ const Calendar = (props: Props) => {
       >
         <Scheduler
           view="month"
-          week={{
-            weekDays: [0, 1, 2, 3, 4, 5],
-            weekStartOn: 6,
-            startHour: 9,
-            endHour: 17,
-            step: 10,
-          }}
-          events={events || []}
+          events={events ? [...events] : []}
           onConfirm={createNewEvent}
           onDelete={deleteEvent}
           onEventDrop={dragAndDropEvent}

@@ -26,12 +26,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { authSliceActions, useAuthSliceSlice } from '../slice';
 import { RootState } from 'types';
 import { isAuthenticated } from 'app/core/modules/PrivateRoute';
+import { useLocation } from 'react-router';
 
 function Login() {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { actions } = useAuthSliceSlice();
   const history = useHistory();
+  const location = useLocation<any>();
+  const from = location.state?.from;
 
   const [isShowPassword, setIsShowPassword] = useState(false);
   const isLoading = useSelector(
@@ -78,8 +81,11 @@ function Login() {
   };
 
   useEffect(() => {
+    console.log(from);
+    console.log(location);
     if (isAuthenticated()) {
-      history.push('/');
+      if (from) history.push(from);
+      else history.push('/rooms');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);

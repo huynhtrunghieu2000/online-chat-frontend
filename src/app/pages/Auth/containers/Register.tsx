@@ -8,6 +8,7 @@ import {
   FormLabel,
   Icon,
   IconButton,
+  Image,
   Input,
   InputGroup,
   InputRightElement,
@@ -23,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuthSliceSlice } from '../slice';
 import { RootState } from 'types';
+import EmailSentImage from 'assets/images/mail_sent.svg';
 
 function Register() {
   const { t, i18n } = useTranslation();
@@ -39,6 +41,10 @@ function Register() {
   const isRegisterSuccess = useSelector(
     (state: RootState) => state.authSlice?.isRegisterSuccess,
   );
+  const isLoading = useSelector(
+    (state: RootState) => state.authSlice?.isLoading,
+  );
+
   const registerFields = [
     {
       name: 'email',
@@ -165,7 +171,7 @@ function Register() {
                 mt={4}
                 isFullWidth
                 colorScheme="purple"
-                isLoading={isSubmitting}
+                isLoading={isLoading}
                 type="submit"
               >
                 Register
@@ -173,7 +179,10 @@ function Register() {
             </Box>
           </>
         ) : (
-          <Text>Check your email to verify account</Text>
+          <>
+            <Image src={EmailSentImage} h="100px" mb={6} />
+            <Text>Please check your email to verify account.</Text>
+          </>
         )}
       </Center>
     </Box>

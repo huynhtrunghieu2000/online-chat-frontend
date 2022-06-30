@@ -118,7 +118,6 @@ const slice = createSlice({
       return {
         ...state,
         isLoading: true,
-        ...action.payload,
         isRegisterSuccess: false,
       };
     },
@@ -244,6 +243,38 @@ const slice = createSlice({
         isLoading: false,
         isError: false,
         errorMessage: '',
+      };
+    },
+    receivedNewNotification(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        data: {
+          ...state.data,
+          user: {
+            ...state.data.user,
+            notifications: [...state.data.user.notifications, action.payload],
+          },
+        },
+      };
+    },
+    updateReadNotification(state, action: PayloadAction<any>) {
+      const notificationIds: number[] = action.payload.ids;
+      const newNotification = state.data.user.notifications.map(notification =>
+        notificationIds.includes(notification.id)
+          ? { ...notification, is_read: action.payload.is_read }
+          : notification,
+      );
+      return {
+        ...state,
+        isLoading: false,
+        data: {
+          ...state.data,
+          user: {
+            ...state.data.user,
+            notifications: newNotification,
+          },
+        },
       };
     },
     logout(state) {

@@ -1,7 +1,8 @@
 import React from 'react';
 import { decodeToken } from 'react-jwt';
 import { getToken } from '../services/storage.service';
-import { Redirect, Route, useLocation } from 'react-router-dom';
+import { Redirect, Route, useLocation, useHistory } from 'react-router-dom';
+
 
 export const isAuthenticated = () => {
   const token = getToken();
@@ -14,14 +15,16 @@ export const isAuthenticated = () => {
 
 const PrivateRoute = ({ component: WrappedComponent, ...rest }) => {
   const location = useLocation();
+  const history = useHistory();
 
+  if (!isAuthenticated())
+    history.push({
+      pathname: '/auth/login',
+      state: { from: location.pathname },
+    });
   return (
     <Route {...rest}>
-      {isAuthenticated() ? (
-        <WrappedComponent />
-      ) : (
-        <Redirect to={{ pathname: '/auth/login', state: { from: location } }} />
-      )}
+      <WrappedComponent />
     </Route>
   );
 };

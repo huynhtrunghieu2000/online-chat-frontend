@@ -151,7 +151,7 @@ const CallingSection = ({
   };
 
   return (
-    <>
+    <Box display="flex" height="full">
       <ChatBox
         isOpen={isOpenMsgBox}
         messageList={messageList}
@@ -370,7 +370,7 @@ const CallingSection = ({
           <IconButton aria-label="chat" icon={<Settings fontSize="small" />} />
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 

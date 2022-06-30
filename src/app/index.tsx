@@ -29,6 +29,7 @@ import { Box } from '@chakra-ui/react';
 import { Room } from './pages/Room';
 import { SocketClient } from './core/contexts/socket-client';
 import ChangePassword from './pages/Auth/containers/ChangePassword';
+import JoinByInvite from './components/JoinByInvite';
 
 export function App() {
   const { i18n } = useTranslation();
@@ -54,7 +55,7 @@ export function App() {
     }
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
+  }, []);
 
   return (
     <BrowserRouter
@@ -72,6 +73,7 @@ export function App() {
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/auth" component={Auth} />
+          <PrivateRoute path="/invite/:code" component={JoinByInvite} />
           <PrivateRoute path="/dashboard" component={Dashboard} />
           <PrivateRoute path="/messenger" component={Messenger} />
           <PrivateRoute path="/rooms" component={Room} />

@@ -5,6 +5,11 @@ import MessageBox from 'app/components/MessageBox';
 import MessageEditor from 'app/components/MessageEditor';
 
 const ChatBox = ({ isOpen, sendMessage, messageList = [] }) => {
+  console.log(
+    '🚀 ~ file: ChatBox.tsx ~ line 8 ~ ChatBox ~ messageList',
+    messageList,
+  );
+
   const [hidden, setHidden] = useState(!isOpen);
   return (
     <motion.div
@@ -22,23 +27,30 @@ const ChatBox = ({ isOpen, sendMessage, messageList = [] }) => {
         top: '0',
       }}
     >
-      <Text
-        fontSize="lg"
-        fontWeight="bold"
-        p={3}
-        pt={4}
-        borderBottomColor="gray.100"
-        borderBottomWidth={1}
-      >
-        Messages
-      </Text>
-      <Box display="flex" flexDirection="column" height="calc(100% - 125px)">
-        <MessageBox
-          messageList={messageList}
-          avatarSize="sm"
-          channelType="video"
-        />
-        <MessageEditor onSubmit={sendMessage} />
+      <Box height="full">
+        <Text
+          fontSize="lg"
+          fontWeight="bold"
+          p={3}
+          pt={4}
+          borderBottomColor="gray.100"
+          borderBottomWidth={1}
+        >
+          Messages
+        </Text>
+        <Box
+          display="flex"
+          flexDirection="column"
+          height="calc(100% - 125px)"
+          p={2}
+        >
+          <MessageBox
+            messageList={messageList}
+            avatarSize="sm"
+            channelType="video"
+          />
+          <MessageEditor onSubmit={sendMessage} isOnlyText={true} />
+        </Box>
       </Box>
     </motion.div>
   );

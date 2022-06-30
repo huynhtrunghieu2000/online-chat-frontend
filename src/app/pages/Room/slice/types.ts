@@ -5,6 +5,7 @@ export interface RoomState {
   channelDetail: any;
   messages: any[];
   currentMeeting: any;
+  socketCondition: any;
   isCreateRoomSuccess: boolean;
   isCreateChannelSuccess: boolean;
   isInviteUserSuccess: boolean;
@@ -14,6 +15,7 @@ export interface RoomState {
   isUpdateRoleMemberSuccess: boolean;
   isUpdateChannelSuccess: boolean;
   isRemoveChannelSuccess: boolean;
+  isCreateEventSuccess: boolean;
   isLoading: boolean;
   hasError: boolean;
   error: any;

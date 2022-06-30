@@ -3,16 +3,29 @@
  * NavigationBar
  *
  */
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import {
   Avatar,
   Box,
   Button,
   Container,
+  Icon,
+  IconButton,
   Image,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
   Text,
 } from '@chakra-ui/react';
+import { PopoverTrigger } from 'app/components/PopoverTrigger';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { messages } from './messages';
@@ -25,11 +38,15 @@ import { useAuthSliceSlice } from 'app/pages/Auth/slice';
 import { TabNavigator } from '../TabNavigator';
 import {
   EventNote,
+  ExitToApp,
   Forum,
   Home,
   MeetingRoom,
+  Notifications,
   Person,
 } from '@mui/icons-material';
+import NotificationBody from './NotificationBody';
+import { FiberManualRecord } from '@mui/icons-material';
 interface Props {}
 
 export const NavigationBar = memo((props: Props) => {
@@ -38,6 +55,7 @@ export const NavigationBar = memo((props: Props) => {
   const dispatch = useDispatch();
   const { actions } = useAuthSliceSlice();
   const history = useHistory();
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const tabList = [
     // {
@@ -66,14 +84,26 @@ export const NavigationBar = memo((props: Props) => {
       icon: Person,
     },
   ];
-  const userData = useSelector(
-    (state: RootState) => state.authSlice?.data?.user,
-  );
 
   const handleLogout = () => {
     dispatch(actions.logout());
   };
 
+  const avatarMenu = [
+    {
+      name: 'Logout',
+      handler: handleLogout,
+      icon: ExitToApp,
+      color: 'red.500',
+    },
+  ];
+  const userData = useSelector(
+    (state: RootState) => state.authSlice?.data?.user,
+  );
+  const unreadNotificationCount = userData?.notifications?.reduce(
+    (prev, notification) => (notification.is_read ? prev : prev + 1),
+    0,
+  );
   return (
     <Box
       px={4}
@@ -115,10 +145,86 @@ export const NavigationBar = memo((props: Props) => {
           </>
         ) : (
           <>
-            <Button mr={2} onClick={handleLogout}>
-              Log out
-            </Button>
-            <Avatar colorScheme="purple" size="md" src={userData?.avatar} name={userData.email} />
+            <Popover
+              colorScheme="purple"
+              onClose={() => setIsNotificationsOpen(false)}
+              onOpen={() => setIsNotificationsOpen(true)}
+              size="xl"
+            >
+              <PopoverTrigger>
+                <Box pos="relative">
+                  <IconButton
+                    aria-label="notification"
+                    isRound
+                    size="lg"
+                    mr={2}
+                    color={isNotificationsOpen ? 'purple.500' : 'gray.600'}
+                    backgroundColor={isNotificationsOpen ? 'purple.100' : ''}
+                    _focus={{
+                      boxShadow: 'none',
+                    }}
+                  >
+                    <Icon as={Notifications} />
+                  </IconButton>
+                  {unreadNotificationCount > 0 && !isNotificationsOpen ? (
+                    <Icon
+                      as={FiberManualRecord}
+                      pos="absolute"
+                      top={-1}
+                      right={1}
+                      w={'22px'}
+                      h={'22px'}
+                      color="purple.500"
+                    />
+                  ) : (
+                    ''
+                  )}
+                </Box>
+              </PopoverTrigger>
+              <PopoverContent
+                mr={4}
+                outline="none"
+                width={400}
+                _focus={{
+                  boxShadow: 'none',
+                }}
+                maxH={500}
+                overflow="scroll"
+              >
+                <PopoverHeader>
+                  <Text fontWeight="bold" fontSize="xl">
+                    Notifications
+                  </Text>
+                </PopoverHeader>
+                <PopoverBody>
+                  <NotificationBody />
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
+            <Menu>
+              <MenuButton>
+                <Avatar
+                  colorScheme="purple"
+                  size="md"
+                  src={userData?.avatar}
+                  name={userData.email}
+                />
+              </MenuButton>
+              <MenuList>
+                {avatarMenu.map(item => (
+                  <MenuItem
+                    key={item.name}
+                    onClick={item.handler}
+                    color={item.color}
+                    display="flex"
+                    justifyContent="space-between"
+                  >
+                    {item.name}
+                    <Icon as={item.icon} />
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
           </>
         )}
       </Box>

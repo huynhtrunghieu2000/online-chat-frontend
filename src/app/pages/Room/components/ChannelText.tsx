@@ -153,7 +153,7 @@ const ChannelText = ({ message, handleSubmitMessage }) => {
           </Box>
         )}
       </Box>
-      <Box height={90}>
+      <Box p={5}>
         <MessageEditor onSubmit={handleSubmitMessage} />
       </Box>
     </Box>

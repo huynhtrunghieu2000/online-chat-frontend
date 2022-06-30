@@ -34,7 +34,7 @@ const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider('4F32253F-3484-4761-9E93-D98B704FF267'),
   // Optional argument. If true, the SDK automatically refreshes App Check
   // tokens as needed.
-  isTokenAutoRefreshEnabled: true,
+  // isTokenAutoRefreshEnabled: true,
 });
 // export const analytics = getAnalytics(app);
 export const storage = getStorage(app);

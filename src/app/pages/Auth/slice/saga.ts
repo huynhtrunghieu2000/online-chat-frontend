@@ -118,6 +118,15 @@ function* registerVerify({ payload }) {
   }
 }
 
+function* updateReadNotification({ payload }) {
+  try {
+    yield call(HTTPService.put, API_ENDPOINT.user.notification, payload);
+    console.log('updated notification');
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 function* logout() {
   try {
     yield call(removeToken);
@@ -136,4 +145,5 @@ export function* authSliceSaga() {
   yield takeLatest(actions.searchUser, searchUser);
   yield takeLatest(actions.logout, logout);
   yield takeLatest(actions.changePassword, changePassword);
+  yield takeLatest(actions.updateReadNotification, updateReadNotification);
 }
