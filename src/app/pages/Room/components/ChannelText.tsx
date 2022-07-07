@@ -167,6 +167,22 @@ export const UpdateChannelInfoDialog = ({ onClose }) => {
   const { setDialog } = useDialog();
 
   const channel = useSelector((state: RootState) => state.room?.channelDetail);
+  const [error, setError] = React.useState('');
+
+  useEffect(() => {
+    if (!name) {
+      setError("Channel's name is required");
+    } else if (name.length < 3) {
+      setError('Name must be at least 3 characters');
+    } else setError('');
+  }, [name]);
+
+  useEffect(() => {
+    return () => {
+      setName('');
+      setError('');
+    };
+  }, []);
 
   useEffect(() => {
     if (channel) {
@@ -181,6 +197,7 @@ export const UpdateChannelInfoDialog = ({ onClose }) => {
           Channel name:
         </Text>
         <Input value={name} onChange={e => setName(e.target.value)} mb={2} />
+        <Text fontSize="smaller" color="red.500">{error}</Text>
       </Box>
       <Box display="flex" justifyContent="flex-end" mt={8}>
         <Button
@@ -189,6 +206,7 @@ export const UpdateChannelInfoDialog = ({ onClose }) => {
             onClose(name);
             setDialog(null);
           }}
+          disabled={!!error}
           colorScheme="purple"
         >
           Save

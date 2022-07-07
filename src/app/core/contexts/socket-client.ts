@@ -50,6 +50,17 @@ export class SocketClient {
     return this.socket;
   }
 
+  public connect() {
+    this.socket = io(API_URL, {
+      transports: ['websocket'],
+      auth: {
+        token: getToken(),
+      },
+      autoConnect: false,
+    });
+    console.log('connecting');
+  }
+
   // get conferenceSocket() {
   //   return this._conferenceSocket;
   // }

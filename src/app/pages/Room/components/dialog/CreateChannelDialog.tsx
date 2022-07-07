@@ -8,10 +8,11 @@ import {
 } from '@chakra-ui/react';
 import { useDialog } from 'app/components/Dialog/Dialog';
 import RadioCard from 'app/components/RadioCard';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const CreateChannelDialog = ({ onClose }) => {
   const [name, setName] = React.useState('');
+  const [error, setError] = React.useState('');
   const { setDialog } = useDialog();
 
   const { getRootProps, getRadioProps, value } = useRadioGroup({
@@ -27,6 +28,21 @@ const CreateChannelDialog = ({ onClose }) => {
     },
   ];
   const group = getRootProps();
+
+  useEffect(() => {
+    if (!name) {
+      setError("Channel's name is required");
+    } else if (name.length < 3) {
+      setError('Name must be at least 3 characters');
+    } else setError('');
+  }, [name]);
+
+  useEffect(() => {
+    return () => {
+      setName('');
+      setError('');
+    };
+  }, []);
 
   return (
     <Box display="flex" flexDir="column">
@@ -52,6 +68,7 @@ const CreateChannelDialog = ({ onClose }) => {
         mb={2}
         placeholder="Channel name"
       />
+      <Text fontSize="smaller">Channel's name at least 3 characters</Text>
 
       <Box alignSelf="end" mt={4}>
         <Button
@@ -61,6 +78,7 @@ const CreateChannelDialog = ({ onClose }) => {
             onClose({ name, type: value });
             setDialog(null);
           }}
+          disabled={!!error}
         >
           Create
         </Button>

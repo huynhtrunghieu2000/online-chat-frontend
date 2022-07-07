@@ -96,6 +96,21 @@ function* leaveRoom({ payload }) {
   }
 }
 
+function* deleteRoom({ payload }) {
+  try {
+    console.log(payload);
+    const response = yield call(
+      HTTPService.delete,
+      `${API_ENDPOINT.room.index}/${payload.id}`,
+      payload,
+    );
+    console.log(response);
+    yield put(actions.deleteRoomSuccess(response));
+  } catch (error) {
+    yield put(actions.deleteRoomFailure(error));
+  }
+}
+
 function* removeMember({ payload }) {
   try {
     const response = yield call(
@@ -191,6 +206,31 @@ function* createRoomEvent({ payload }) {
   }
 }
 
+function* updateRoomEvent({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.put,
+      `${API_ENDPOINT.room.index}/${payload.id}/event`,
+      payload,
+    );
+    yield put(actions.updateRoomEventSuccess(payload.event));
+  } catch (error) {
+    yield put(actions.updateRoomEventFailure(error));
+  }
+}
+function* deleteRoomEvent({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.delete,
+      `${API_ENDPOINT.room.index}/${payload.id}/event`,
+      payload,
+    );
+    yield put(actions.deleteRoomEventSuccess(payload.event));
+  } catch (error) {
+    yield put(actions.deleteRoomEventFailure(error));
+  }
+}
+
 function* removeChannel({ payload }) {
   try {
     yield call(
@@ -250,21 +290,21 @@ function* inviteUserToRoom({ payload }) {
   }
 }
 
-// function* joinChannel({ payload }) {
-//   try {
-//     const data = {
-//       channel: {
-//         name: payload.name,
-//         type: payload.type,
-//       },
-//     };
-//   } catch (error) {}
-// }
 // ================= Socket Channel ==================
 const subscribeSocketChannel = (socket: Socket) => {
   return eventChannel(emit => {
     socket.on(SOCKET_EVENT.CHANNEL.NEW_MESSAGE, data => {
       emit(actions.newMessageChannelReceived(data));
+    });
+    socket.io.on('error', error => {
+      emit(actions.socketError(error));
+    });
+    socket.io.on('reconnect', attempt => {
+      console.log(
+        '🚀 ~ file: saga.ts ~ line 298 ~ subscribeSocketChannel ~ attempt',
+        attempt,
+      );
+      emit(actions.socketReconnected());
     });
     socket.on('disconnected', () => {
       emit(actions.socketDisconnected('Disconnected from server...'));
@@ -340,4 +380,7 @@ export function* roomSaga() {
   yield takeLatest(actions.getRoomByInviteCode, getRoomByInviteCode);
   yield takeLatest(actions.joinRoomByInviteCode, joinRoomByInviteCode);
   yield takeLatest(actions.createRoomEvent, createRoomEvent);
+  yield takeLatest(actions.updateRoomEvent, updateRoomEvent);
+  yield takeLatest(actions.deleteRoomEvent, deleteRoomEvent);
+  yield takeLatest(actions.deleteRoom, deleteRoom);
 }

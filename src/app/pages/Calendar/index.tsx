@@ -10,7 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'types';
 import { useCalendarSlice } from './slice';
 import { Event } from 'app/core/models/Event';
-import { Box } from '@chakra-ui/react';
+import { Box, useToast } from '@chakra-ui/react';
+import CalendarPopper from './components/CalendarPopper';
 
 interface Props {}
 
@@ -31,6 +32,7 @@ const theme = createTheme({
 const Calendar = (props: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t, i18n } = useTranslation();
+  const toast = useToast();
   const dispatch = useDispatch();
   const { actions } = useCalendarSlice();
 
@@ -39,6 +41,15 @@ const Calendar = (props: Props) => {
   ) as Event[];
   const isLoading = useSelector(
     (state: RootState) => state.calendar?.isLoading,
+  );
+  const isCreatedSuccess = useSelector(
+    (state: RootState) => state.calendar?.isCreatedSuccess,
+  );
+  const isUpdatedSuccess = useSelector(
+    (state: RootState) => state.calendar?.isUpdatedSuccess,
+  );
+  const isDeletedSuccess = useSelector(
+    (state: RootState) => state.calendar?.isDeletedSuccess,
   );
 
   const createNewEvent = async (
@@ -72,14 +83,47 @@ const Calendar = (props: Props) => {
 
   React.useEffect(() => {
     dispatch(actions.getEvents());
+
+    return () => {
+      dispatch(actions.clearGetEvents());
+    };
   }, []);
+
+  React.useEffect(() => {
+    if (isCreatedSuccess) {
+      toast({
+        status: 'success',
+        title: 'New event created successfully.',
+      });
+      dispatch(actions.clearCreateNewEvents());
+    }
+  }, [isCreatedSuccess]);
+  React.useEffect(() => {
+    if (isUpdatedSuccess) {
+      toast({
+        status: 'success',
+        title: 'Event updated successfully.',
+      });
+      dispatch(actions.clearUpdateEvents());
+    }
+  }, [isUpdatedSuccess]);
+  React.useEffect(() => {
+    if (isDeletedSuccess) {
+      toast({
+        status: 'success',
+        title: 'Event deleted successfully.',
+      });
+      dispatch(actions.clearDeleteEvents());
+    }
+  }, [isDeletedSuccess]);
 
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
           '.rs__outer_table > div': {
-            overflow: 'hidden',
+            overflowY: 'scroll',
+            overflowX: 'hidden',
           },
           '.css-1jm7bvk-MuiAvatar-root': {
             backgroundColor: 'purple.300',
@@ -88,6 +132,19 @@ const Calendar = (props: Props) => {
       >
         <Scheduler
           view="month"
+          month={{
+            weekDays: [0, 1, 2, 3, 4, 5, 6],
+            weekStartOn: 0,
+            startHour: 0,
+            endHour: 23,
+          }}
+          day={{
+            startHour: 0,
+            endHour: 23,
+            step: 30,
+          }}
+          resourceViewMode="tabs"
+          viewerExtraComponent={CalendarPopper}
           events={events ? [...events] : []}
           onConfirm={createNewEvent}
           onDelete={deleteEvent}

@@ -11,11 +11,13 @@ import { RootState } from 'types';
 import PrejoinSection from '../components/channel-video/PrejoinSection';
 import ChannelText from '../components/ChannelText';
 import { useRoomSlice } from '../slice';
+import { SocketClient } from 'app/core/contexts/socket-client';
 
 const ChannelContent = () => {
   const dispatch = useDispatch();
   const { actions } = useRoomSlice();
   const { idChannel } = useParams() as { idChannel: string };
+  const socket = SocketClient.getInstance();
 
   const messages =
     useSelector((state: RootState) => state.room?.messages) || [];
@@ -27,6 +29,7 @@ const ChannelContent = () => {
   );
   useEffect(() => {
     dispatch(actions.getChannelDetail({ idChannel }));
+    socket.Socket.emit('channel:join', idChannel);
   }, [idChannel]);
 
   const handleSubmitMessage = (message: string) => {

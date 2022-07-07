@@ -8,7 +8,7 @@ export const API_ENDPOINT = {
     updateProfile: '/user/update_profile',
     changePassword: '/user/change_password',
     forgotPassword: '/user/forgot_password',
-    forgotPasswordVerify: '/user/forgot_password/verify/:token',
+    forgotPasswordVerify: '/user/forgot_password/verify',
     resetPassword: '/user/reset_password',
     notification: '/user/notification',
   },

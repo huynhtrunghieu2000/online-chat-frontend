@@ -54,27 +54,84 @@ const NotificationBody = () => {
               );
             }}
           >
-            <Box>
+            <Box width="90%" lineHeight={1.2}>
               {/* Message */}
               {notification.type === NotificationType.ROOM_INVITATION && (
-                <Box display="flex">
-                  <Text fontSize="sm">You are added into room: </Text>
+                <Box>
+                  <Text fontSize="sm" display="inline">
+                    You are added into room:{' '}
+                  </Text>
                   &nbsp;
-                  <Text fontSize="sm" fontWeight={600}>
+                  <Text fontSize="sm" display="inline" fontWeight={600}>
                     {notification.data.room.name}
                   </Text>
                 </Box>
               )}
               {notification.type === NotificationType.EVENT_INVITED && (
-                <Box display="flex" flexWrap="wrap">
-                  <Text fontSize="sm" fontWeight={600}>
+                <Box>
+                  <Text fontSize="sm" fontWeight={600} display="inline">
                     {notification.data.created_by.email}
                   </Text>
                   &nbsp;
-                  <Text fontSize="sm">invite you to an event</Text>
+                  <Text fontSize="sm" display="inline">
+                    invite you to event
+                  </Text>
+                  &nbsp;
+                  <Text fontSize="sm" fontWeight={600} display="inline">
+                    {notification.data.event.title}
+                  </Text>
                 </Box>
               )}
-              <Text fontSize="sm" color="purple.500" fontWeight={600}>
+              {notification.type === NotificationType.EVENT_CHANGED && (
+                <Box>
+                  <Text fontSize="sm" fontWeight={600} display="inline">
+                    {notification.data.updated_by.email}
+                  </Text>
+                  &nbsp;
+                  <Text fontSize="sm" display="inline">
+                    update
+                  </Text>
+                  &nbsp;
+                  <Text fontSize="sm" fontWeight={600} display="inline">
+                    {notification.data.event.title}
+                  </Text>
+                  &nbsp;
+                  <Text fontSize="sm" display="inline">
+                    event information.
+                  </Text>
+                </Box>
+              )}
+              {notification.type === NotificationType.EVENT_REMOVED && (
+                <Box>
+                  <Text fontSize="sm" display="inline">
+                    Event
+                  </Text>
+                  &nbsp;
+                  <Text fontSize="sm" fontWeight={600} display="inline">
+                    {notification.data.event.title}
+                  </Text>
+                  &nbsp;
+                  <Text fontSize="sm" display="inline">
+                    you joined was removed.
+                  </Text>
+                </Box>
+              )}
+              {notification.type === NotificationType.ROOM_ROLE_CHANGE && (
+                <Box>
+                  <Text fontSize="sm" display="inline">
+                    Your role changed in a room.
+                  </Text>
+                  &nbsp;
+                  {/* <Text fontSize="sm" fontWeight={600} display="inline">
+                    {notification.data.event.title}
+                  </Text> */}
+                  &nbsp;
+                  {/* <Text fontSize="sm" display="inline">
+                    you joined was removed.
+                  </Text> */}
+                </Box>
+              )}
+              <Text fontSize="sm" color="purple.500" fontWeight={600} mt={1}>
                 {moment(notification.createdAt).fromNow()}
               </Text>
             </Box>

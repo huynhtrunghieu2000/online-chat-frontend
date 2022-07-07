@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { useDialog } from 'app/components/Dialog/Dialog';
 import { useAuthSliceSlice } from 'app/pages/Auth/slice';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'types';
 import { useRoomSlice } from '../../slice';
@@ -46,6 +46,12 @@ const AddMemberDialog = ({ onClose }) => {
       dispatch(roomActions.updateRoomDetail(data));
     }
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(actions.clearSearchUser());
+    };
+  }, []);
 
   return (
     <Box display="flex" flexDir="column">
@@ -121,21 +127,23 @@ const AddMemberDialog = ({ onClose }) => {
               fontSize="sm"
               textDecoration="underline"
               cursor="pointer"
-              onClick={() =>
+              onClick={() => {
                 navigator.clipboard.writeText(
                   `https://localhost:3000/invite/${currentRoom.code}`,
-                )
-              }
+                );
+                toast({ status: 'success', title: 'Copied' });
+              }}
             >
               https://localhost:3000/invite/{currentRoom.code}
             </Text>
           </Box>
           <Button
-            onClick={() =>
+            onClick={() => {
               navigator.clipboard.writeText(
                 `https://localhost:3000/invite/${currentRoom.code}`,
-              )
-            }
+              );
+              toast({ status: 'success', title: 'Copied' });
+            }}
           >
             Copy link
           </Button>

@@ -14,6 +14,7 @@ import {
   IconButton,
   InputRightElement,
   InputGroup,
+  useToast,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { Helmet } from 'react-helmet-async';
@@ -30,6 +31,7 @@ import { useLocation } from 'react-router';
 
 function Login() {
   const { t, i18n } = useTranslation();
+  const toast = useToast();
   const dispatch = useDispatch();
   const { actions } = useAuthSliceSlice();
   const history = useHistory();
@@ -39,6 +41,9 @@ function Login() {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const isLoading = useSelector(
     (state: RootState) => state.authSlice?.isLoading,
+  );
+  const error = useSelector(
+    (state: RootState) => state.authSlice?.errorMessage,
   );
   const userData = useSelector((state: RootState) => state.authSlice?.data);
 
@@ -90,6 +95,18 @@ function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
 
+  useEffect(() => {
+    if (error) {
+      toast({
+        status: 'error',
+        title: 'Login failed',
+        description: error,
+      });
+
+      dispatch(actions.clearLogin());
+    }
+  }, [error]);
+
   return (
     <div>
       <Helmet>
@@ -107,7 +124,16 @@ function Login() {
         <Text fontSize="sm" fontWeight="light" lineHeight={1.2}>
           Login to getting started
         </Text>
-        <Box as="form" w="96" p={5} mt={5} onSubmit={handleSubmit(onSubmit)}>
+        <Box
+          as="form"
+          w="96"
+          p={5}
+          mt={5}
+          onSubmit={handleSubmit(onSubmit)}
+          border="1px solid"
+          borderColor="gray.300"
+          borderRadius={4}
+        >
           {loginFields.map(field => (
             <FormControl
               mb={3}

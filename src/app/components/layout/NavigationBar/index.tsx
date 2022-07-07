@@ -104,6 +104,14 @@ export const NavigationBar = memo((props: Props) => {
     (prev, notification) => (notification.is_read ? prev : prev + 1),
     0,
   );
+  const markAllRead = () => {
+    dispatch(
+      actions.updateReadNotification({
+        is_read: true,
+        ids: userData?.notifications?.map(notification => notification.id),
+      }),
+    );
+  };
   return (
     <Box
       px={4}
@@ -113,7 +121,7 @@ export const NavigationBar = memo((props: Props) => {
       display="flex"
       alignItems="center"
       justifyContent="space-between"
-      zIndex={1}
+      zIndex={100}
     >
       <Box flex={1} display="flex" alignItems="center" py={2}>
         <Image src={LogoImage} alt={APP_NAME} w={12} h={12} />
@@ -191,10 +199,25 @@ export const NavigationBar = memo((props: Props) => {
                 maxH={500}
                 overflow="scroll"
               >
-                <PopoverHeader>
+                <PopoverHeader
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
                   <Text fontWeight="bold" fontSize="xl">
                     Notifications
                   </Text>
+                  <Box>
+                    <Text
+                      fontSize="smaller"
+                      textDecor="underline"
+                      cursor="pointer"
+                      color="gray.600"
+                      onClick={markAllRead}
+                    >
+                      Mark all as read
+                    </Text>
+                  </Box>
                 </PopoverHeader>
                 <PopoverBody>
                   <NotificationBody />

@@ -2,12 +2,19 @@ import { messages } from '../../../components/layout/NavigationBar/messages';
 import HTTPService from 'app/core/services/http.service';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { authSliceActions as actions } from '.';
-import { removeToken, setToken } from 'app/core/services/storage.service';
+import {
+  removeToken,
+  setToken,
+  getToken,
+} from 'app/core/services/storage.service';
 import { API_ENDPOINT } from 'app/core/constants/endpoint';
 import { SocketClient } from 'app/core/contexts/socket-client';
 
 const connectSocket = () => {
   const socket = SocketClient.getInstance().Socket;
+  socket.auth = {
+    token: getToken(),
+  };
   socket.connect();
   return new Promise(resolve => {
     socket.on('connect', () => {
@@ -64,6 +71,45 @@ function* register({ payload }) {
   } catch (error) {
     yield put(actions.registerFailure(error));
     removeToken();
+  }
+}
+
+function* resetPassword({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.post,
+      API_ENDPOINT.user.resetPassword,
+      payload,
+    );
+    yield put(actions.resetPasswordSuccess(response));
+  } catch (error) {
+    yield put(actions.resetPasswordFailure(error));
+  }
+}
+
+function* forgotPassword({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.post,
+      API_ENDPOINT.user.forgotPassword,
+      payload,
+    );
+    yield put(actions.forgotPasswordSuccess(response));
+  } catch (error) {
+    yield put(actions.forgotPasswordFailure(error));
+    removeToken();
+  }
+}
+
+function* forgotPasswordVerify({ payload }) {
+  try {
+    const response = yield call(
+      HTTPService.get,
+      `${API_ENDPOINT.user.forgotPasswordVerify}/${payload}`,
+    );
+    yield put(actions.forgotPasswordVerifySuccess(response));
+  } catch (error) {
+    yield put(actions.forgotPasswordVerifyFailure(error));
   }
 }
 
@@ -146,4 +192,7 @@ export function* authSliceSaga() {
   yield takeLatest(actions.logout, logout);
   yield takeLatest(actions.changePassword, changePassword);
   yield takeLatest(actions.updateReadNotification, updateReadNotification);
+  yield takeLatest(actions.forgotPassword, forgotPassword);
+  yield takeLatest(actions.forgotPasswordVerify, forgotPasswordVerify);
+  yield takeLatest(actions.resetPassword, resetPassword);
 }

@@ -42,6 +42,22 @@ const UpdateRoomInfoDialog = ({ onClose }) => {
     };
     dispatch(actions.updateRoomDetail(updateData));
   };
+  const [error, setError] = React.useState('');
+
+  useEffect(() => {
+    if (!name) {
+      setError("Room's name is required");
+    } else if (name.length < 3) {
+      setError('Name must be at least 3 characters');
+    } else setError('');
+  }, [name]);
+
+  useEffect(() => {
+    return () => {
+      setName('');
+      setError('');
+    };
+  }, []);
   return (
     <Box>
       <Box display="flex">
@@ -57,10 +73,18 @@ const UpdateRoomInfoDialog = ({ onClose }) => {
             Room name:
           </Text>
           <Input value={name} onChange={e => setName(e.target.value)} mb={2} />
+          <Text fontSize="smaller">
+            Room's name must be at least 3 characters.
+          </Text>
         </Box>
       </Box>
       <Box display="flex" justifyContent="flex-end" mt={8}>
-        <Button mr={3} onClick={() => onUpdateRoomInfo()} colorScheme="purple">
+        <Button
+          mr={3}
+          onClick={() => onUpdateRoomInfo()}
+          colorScheme="purple"
+          disabled={!!error}
+        >
           Save
         </Button>
         <Button

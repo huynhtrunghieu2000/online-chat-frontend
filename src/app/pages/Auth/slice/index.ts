@@ -14,6 +14,9 @@ export const initialState: AuthSliceState = {
   isUpdateProfileSuccess: false,
   isRegisterSuccess: false,
   isChangePasswordSuccess: false,
+  isForgotPasswordSuccess: false,
+  isForgotPasswordVerifySuccess: false,
+  isResetPasswordSuccess: false,
 };
 
 const slice = createSlice({
@@ -145,6 +148,106 @@ const slice = createSlice({
         isError: false,
         errorMessage: '',
         isRegisterSuccess: false,
+      };
+    },
+    forgotPassword(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: true,
+        isForgotPasswordSuccess: false,
+      };
+    },
+    forgotPasswordSuccess(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        data: action.payload,
+        isForgotPasswordSuccess: true,
+      };
+    },
+    forgotPasswordFailure(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMessage: action.payload.message,
+        isForgotPasswordSuccess: false,
+      };
+    },
+    clearForgotPassword(state) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMessage: '',
+        isForgotPasswordSuccess: false,
+        data: null,
+      };
+    },
+    forgotPasswordVerify(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: true,
+        isForgotPasswordVerifySuccess: false,
+      };
+    },
+    forgotPasswordVerifySuccess(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        data: action.payload,
+        isForgotPasswordVerifySuccess: true,
+      };
+    },
+    forgotPasswordVerifyFailure(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMessage: action.payload.message,
+        isForgotPasswordVerifySuccess: false,
+      };
+    },
+    clearForgotPasswordVerify(state) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMessage: '',
+        isForgotPasswordVerifySuccess: false,
+      };
+    },
+    resetPassword(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: true,
+        isResetPasswordSuccess: false,
+      };
+    },
+    resetPasswordSuccess(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        data: action.payload,
+        isResetPasswordSuccess: true,
+      };
+    },
+    resetPasswordFailure(state, action: PayloadAction<any>) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMessage: action.payload.message,
+        isResetPasswordSuccess: false,
+      };
+    },
+    clearResetPassword(state) {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMessage: '',
+        isResetPasswordSuccess: false,
       };
     },
     changePassword(state, action: PayloadAction<any>) {

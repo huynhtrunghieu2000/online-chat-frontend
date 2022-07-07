@@ -11,9 +11,11 @@ export const initialState: RoomState = {
   channelDetail: undefined,
   messages: [],
   currentMeeting: null,
+  isJoinRoomSuccess: false,
   isCreateRoomSuccess: false,
   isUpdateRoomDetailSuccess: false,
   isLeaveRoomSuccess: false,
+  isDeleteRoomSuccess: false,
   isInviteUserSuccess: false,
   isRemoveMemberSuccess: false,
   isUpdateRoleMemberSuccess: false,
@@ -21,6 +23,7 @@ export const initialState: RoomState = {
   isUpdateChannelSuccess: false,
   isRemoveChannelSuccess: false,
   isCreateEventSuccess: false,
+  isUpdateEventSuccess: false,
   socketCondition: {},
   isLoading: false,
   hasError: false,
@@ -198,6 +201,40 @@ const slice = createSlice({
         isLeaveRoomSuccess: false,
       };
     },
+    deleteRoom: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isDeleteRoomSuccess: false,
+      };
+    },
+    deleteRoomSuccess: (state: RoomState, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        roomList: state.roomList.filter(room => room.id !== action.payload),
+        roomDetail: null,
+        isDeleteRoomSuccess: true,
+      };
+    },
+    deleteRoomFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+        isDeleteRoomSuccess: false,
+      };
+    },
+    clearDeleteRoom: state => {
+      return {
+        ...state,
+        isLoading: false,
+        hasError: false,
+        error: '',
+        isDeleteRoomSuccess: false,
+      };
+    },
     removeMember: (state, action: PayloadAction<any>) => {
       return {
         ...state,
@@ -295,7 +332,7 @@ const slice = createSlice({
         ...state,
         isLoading: false,
         hasError: true,
-        error: action.payload.message,
+        error: action.payload?.message,
       };
     },
     clearGetChannelDetail: state => {
@@ -527,6 +564,7 @@ const slice = createSlice({
         isLoading: false,
         hasError: true,
         error: action.payload,
+        isJoinRoomSuccess: false,
       };
     },
     clearGetRoomByInviteCode: state => {
@@ -542,6 +580,7 @@ const slice = createSlice({
       return {
         ...state,
         isLoading: true,
+        isJoinRoomSuccess: false,
       };
     },
     joinRoomByInviteCodeSuccess: (state, action: PayloadAction<any>) => {
@@ -549,6 +588,7 @@ const slice = createSlice({
         ...state,
         isLoading: false,
         roomDetail: action.payload,
+        isJoinRoomSuccess: true,
       };
     },
     joinRoomByInviteCodeFailure: (state, action: PayloadAction<any>) => {
@@ -557,6 +597,7 @@ const slice = createSlice({
         isLoading: false,
         hasError: true,
         error: action.payload,
+        isJoinRoomSuccess: false,
       };
     },
     clearJoinRoomByInviteCode: state => {
@@ -566,6 +607,7 @@ const slice = createSlice({
         hasError: false,
         error: '',
         roomDetail: undefined,
+        isJoinRoomSuccess: false,
       };
     },
     createRoomEvent: (state, action: PayloadAction<any>) => {
@@ -606,12 +648,112 @@ const slice = createSlice({
         error: '',
       };
     },
+    updateRoomEvent: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isUpdateEventSuccess: false,
+      };
+    },
+    updateRoomEventSuccess: (state, action: PayloadAction<any>) => {
+      const newEvents = state.roomDetail.Events.map(event =>
+        event.id === action.payload.id ? action.payload : event,
+      );
+      return {
+        ...state,
+        isLoading: false,
+        isUpdateEventSuccess: true,
+        hasError: false,
+        error: '',
+        roomDetail: {
+          ...state.roomDetail,
+          Events: newEvents,
+        },
+      };
+    },
+    updateRoomEventFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isUpdateEventSuccess: false,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+      };
+    },
+    clearUpdateRoomEvent: state => {
+      return {
+        ...state,
+        isUpdateEventSuccess: false,
+        isLoading: false,
+        hasError: false,
+        error: '',
+      };
+    },
+    deleteRoomEvent: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isLoading: true,
+        isDeleteEventSuccess: false,
+      };
+    },
+    deleteRoomEventSuccess: (state, action: PayloadAction<any>) => {
+      const newEvents = state.roomDetail.Events.filter(
+        event => event.id !== action.payload.id,
+      );
+      return {
+        ...state,
+        isLoading: false,
+        isDeleteEventSuccess: true,
+        hasError: false,
+        error: '',
+        roomDetail: {
+          ...state.roomDetail,
+          Events: newEvents,
+        },
+      };
+    },
+    deleteRoomEventFailure: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        isDeleteEventSuccess: false,
+        isLoading: false,
+        hasError: true,
+        error: action.payload,
+      };
+    },
+    clearDeleteRoomEvent: state => {
+      return {
+        ...state,
+        isUpdateEventSuccess: false,
+        isLoading: false,
+        hasError: false,
+        error: '',
+      };
+    },
     socketDisconnected: (state, action: PayloadAction<any>) => {
       return {
         ...state,
         socketCondition: {
           isConnected: false,
           message: action.payload,
+        },
+      };
+    },
+    socketError: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        socketCondition: {
+          ...state.socketCondition,
+          error: action.payload,
+        },
+      };
+    },
+    socketReconnected: state => {
+      return {
+        ...state,
+        socketCondition: {
+          ...state.socketCondition,
+          isConnected: false,
         },
       };
     },

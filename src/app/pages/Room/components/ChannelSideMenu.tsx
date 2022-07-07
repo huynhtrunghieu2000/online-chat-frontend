@@ -16,8 +16,14 @@ import {
 } from '@chakra-ui/react';
 import {
   Abc,
+  DeleteForever,
   Event,
+  ExitToApp,
   FiberManualRecord,
+  GroupAdd,
+  Info,
+  People,
+  PlaylistAdd,
   Settings,
   Videocam,
 } from '@mui/icons-material';
@@ -31,6 +37,7 @@ import AddEventForRoomDialog from './dialog/AddEventForRoomDialog';
 
 import AddMemberDialog from './dialog/AddMemberDialog';
 import CreateChannelDialog from './dialog/CreateChannelDialog';
+import EventInfoPopOver from './dialog/EventInfoPopOver';
 import MemberDialog from './dialog/MemberDialog';
 import UpdateRoomInfoDialog from './dialog/UpdateRoomInfoDialog';
 
@@ -60,6 +67,9 @@ const ChannelSideMenu = () => {
   );
   const isLeaveRoomSuccess = useSelector(
     (state: RootState) => state?.room?.isLeaveRoomSuccess,
+  );
+  const isDeleteRoomSuccess = useSelector(
+    (state: RootState) => state?.room?.isDeleteRoomSuccess,
   );
   const isAdmin = currentRoom?.Users?.filter(
     user => userInfo?.id === user.id && user.ClassroomMember.role === 'owner',
@@ -120,6 +130,18 @@ const ChannelSideMenu = () => {
     }
   }, [isLeaveRoomSuccess]);
 
+  useEffect(() => {
+    if (isDeleteRoomSuccess) {
+      toast({
+        title: 'Delete room success',
+        status: 'success',
+        duration: 2000,
+      });
+      history.push('/rooms');
+      dispatch(actions.clearDeleteRoom());
+    }
+  }, [isDeleteRoomSuccess]);
+
   const handleAddMember = () => {
     const onAddMember = userId => {
       const data = {
@@ -156,18 +178,33 @@ const ChannelSideMenu = () => {
   };
 
   const handleUpdateEvent = id => {
-    const event = eventList.filter(event => Number(event.id) === Number(id));
+    const eventInit = eventList.filter(
+      event => Number(event.id) === Number(id),
+    )[0];
     const onAddEvent = event => {
       const data = {
         event: event,
         id: currentRoom.id,
       };
       console.log(data);
-      dispatch(actions.createRoomEvent(data));
+      dispatch(actions.updateRoomEvent(data));
+    };
+    const onDelete = event => {
+      const data = {
+        event: event,
+        id: currentRoom.id,
+      };
+      dispatch(actions.deleteRoomEvent(data));
     };
     dialog.setDialog({
-      title: 'Add Event',
-      content: <AddEventForRoomDialog initData={event} onClose={onAddEvent} />,
+      title: 'Edit Event',
+      content: (
+        <AddEventForRoomDialog
+          initData={eventInit}
+          onClose={onAddEvent}
+          onDelete={onDelete}
+        />
+      ),
       onClose: dialog.setDialog(null),
       size: '2xl',
     });
@@ -199,6 +236,22 @@ const ChannelSideMenu = () => {
     });
   };
 
+  const handleDeleteRoom = () => {
+    const handleDeleteRoom = () => {
+      const data = {
+        id: currentRoom.id,
+      };
+      dispatch(actions.deleteRoom(data));
+    };
+
+    dialog.setDialog({
+      title: 'Delete Room',
+      content: <ConfirmLeaveRoom onClose={handleDeleteRoom} />,
+      onClose: dialog.setDialog(null),
+      size: '2xl',
+    });
+  };
+
   const handleMember = () => {
     dialog.setDialog({
       title: 'Members',
@@ -211,31 +264,44 @@ const ChannelSideMenu = () => {
     {
       title: 'Create Channel',
       func: handleCreateChannel,
+      icon: PlaylistAdd,
       isHidden: !isAdmin,
     },
     {
       title: 'Room Info',
       func: handleUpdateRoomInfo,
+      icon: Info,
       isHidden: !isAdmin,
     },
     {
       title: 'Create Event',
       func: handleAddEvent,
+      icon: Event,
       isHidden: !isAdmin,
     },
     {
       title: 'Add Member',
       func: handleAddMember,
+      icon: GroupAdd,
       isHidden: !isAdmin,
     },
     {
       title: 'Members',
+      icon: People,
       func: handleMember,
     },
     {
       title: 'Leave Room',
+      icon: ExitToApp,
       func: handleLeaveRoom,
       color: 'red.500',
+    },
+    {
+      title: 'Delete Room',
+      icon: DeleteForever,
+      func: handleDeleteRoom,
+      color: 'red.500',
+      isHidden: !isAdmin,
     },
   ];
 
@@ -265,9 +331,13 @@ const ChannelSideMenu = () => {
                 <MenuItem
                   key={item.title}
                   onClick={item.func}
-                  color={item.color}
+                  color={item.color || 'gray.600'}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
                 >
                   {item.title}
+                  <Icon as={item.icon} boxSize="20px" />
                 </MenuItem>
               ) : (
                 ''
@@ -288,7 +358,11 @@ const ChannelSideMenu = () => {
             <AccordionPanel pb={4}>
               {eventList?.length > 0 ? (
                 eventList?.map(event => (
-                  <Box key={event.id}>
+                  <EventInfoPopOver
+                    key={event.id}
+                    event={event}
+                    handleUpdate={() => handleUpdateEvent(event.id)}
+                  >
                     <Box
                       p={2}
                       _hover={{ backgroundColor: 'gray.200' }}
@@ -296,12 +370,11 @@ const ChannelSideMenu = () => {
                       display="flex"
                       alignItems="center"
                       cursor="pointer"
-                      onClick={() => handleUpdateEvent(event.id)}
                     >
-                      <Icon as={Event} color="gray.500" mr={2} />
+                      <Icon as={Event} color="gray.500" mr={2}/>
                       <Text>{event.title}</Text>
                     </Box>
-                  </Box>
+                  </EventInfoPopOver>
                 ))
               ) : (
                 <Text>There is no event.</Text>
@@ -317,53 +390,55 @@ const ChannelSideMenu = () => {
               <AccordionIcon />
             </AccordionButton>
             <AccordionPanel pb={4}>
-              {channelList?.map(channel => (
-                <Box key={channel.id}>
-                  <Link to={`/rooms/${currentRoom?.id}/${channel.id}`}>
-                    <Box
-                      p={2}
-                      _hover={{ backgroundColor: 'gray.200' }}
-                      borderRadius={5}
-                      display="flex"
-                      alignItems="center"
-                    >
-                      <Icon
-                        as={channelTypeIcon[channel.type]}
-                        color="gray.500"
-                        mr={2}
-                      />
-                      <Text>{channel.name}</Text>
-                    </Box>
-                  </Link>
-                  {channel.userActiveInChannel && (
-                    <Box ml={5}>
-                      {channel.userActiveInChannel?.map(user => (
+              {channelList?.length > 0
+                ? channelList?.map(channel => (
+                    <Box key={channel.id}>
+                      <Link to={`/rooms/${currentRoom?.id}/${channel.id}`}>
                         <Box
-                          key={user.id}
+                          p={2}
+                          _hover={{ backgroundColor: 'gray.200' }}
+                          borderRadius={5}
                           display="flex"
                           alignItems="center"
-                          py={1}
-                          width={210}
                         >
                           <Icon
-                            as={FiberManualRecord}
-                            boxSize={3}
-                            color="green.300"
-                            mr={3}
+                            as={channelTypeIcon[channel.type]}
+                            color="gray.500"
+                            mr={2}
                           />
-                          <Text
-                            textOverflow="ellipsis"
-                            whiteSpace="nowrap"
-                            overflow="hidden"
-                          >
-                            {user.email}
-                          </Text>
+                          <Text>{channel.name}</Text>
                         </Box>
-                      ))}
+                      </Link>
+                      {channel.userActiveInChannel && (
+                        <Box ml={5}>
+                          {channel.userActiveInChannel?.map(user => (
+                            <Box
+                              key={user.id}
+                              display="flex"
+                              alignItems="center"
+                              py={1}
+                              width={210}
+                            >
+                              <Icon
+                                as={FiberManualRecord}
+                                boxSize={3}
+                                color="green.300"
+                                mr={3}
+                              />
+                              <Text
+                                textOverflow="ellipsis"
+                                whiteSpace="nowrap"
+                                overflow="hidden"
+                              >
+                                {user.email}
+                              </Text>
+                            </Box>
+                          ))}
+                        </Box>
+                      )}
                     </Box>
-                  )}
-                </Box>
-              ))}
+                  ))
+                : "There's no channel."}
             </AccordionPanel>
           </AccordionItem>
         </Accordion>

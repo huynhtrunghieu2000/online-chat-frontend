@@ -12,6 +12,9 @@ export const initialState: CalendarState = {
   isProcessing: false,
   hasError: false,
   error: null,
+  isCreatedSuccess: false,
+  isUpdatedSuccess: false,
+  isDeletedSuccess: false,
 };
 
 const slice = createSlice({
@@ -54,6 +57,7 @@ const slice = createSlice({
       return {
         ...state,
         isLoading: true,
+        isCreatedSuccess: false,
       };
     },
     createNewEventsSuccess: (state, action: PayloadAction<any>) => {
@@ -63,6 +67,7 @@ const slice = createSlice({
         events: [...state.events, action.payload],
         error: null,
         hasError: false,
+        isCreatedSuccess: true,
       };
     },
     createNewEventsFailure: (state, action: PayloadAction<any>) => {
@@ -71,6 +76,7 @@ const slice = createSlice({
         isLoading: false,
         hasError: true,
         error: action.payload,
+        isCreatedSuccess: false,
       };
     },
     clearCreateNewEvents: state => {
@@ -79,13 +85,14 @@ const slice = createSlice({
         isLoading: false,
         hasError: false,
         error: null,
-        events: undefined,
+        isCreatedSuccess: false,
       };
     },
     updateEvents: (state, action: PayloadAction<any>) => {
       return {
         ...state,
         isLoading: true,
+        isUpdatedSuccess: false,
       };
     },
     updateEventsSuccess: (state, action: PayloadAction<any>) => {
@@ -98,6 +105,7 @@ const slice = createSlice({
         events: [...newEvents, action.payload],
         error: null,
         hasError: false,
+        isUpdatedSuccess: true,
       };
     },
     updateEventsFailure: (state, action: PayloadAction<any>) => {
@@ -106,6 +114,7 @@ const slice = createSlice({
         isLoading: false,
         hasError: true,
         error: action.payload,
+        isUpdatedSuccess: false,
       };
     },
     clearUpdateEvents: state => {
@@ -114,12 +123,14 @@ const slice = createSlice({
         isLoading: false,
         hasError: false,
         error: null,
+        isUpdatedSuccess: false,
       };
     },
     deleteEvents: (state, action: PayloadAction<any>) => {
       return {
         ...state,
         isLoading: true,
+        isDeletedSuccess: false,
       };
     },
     deleteEventsSuccess: (state, action: PayloadAction<any>) => {
@@ -132,6 +143,7 @@ const slice = createSlice({
         events: newEvents,
         error: null,
         hasError: false,
+        isDeletedSuccess: true,
       };
     },
     deleteEventsFailure: (state, action: PayloadAction<any>) => {
@@ -140,6 +152,7 @@ const slice = createSlice({
         isLoading: false,
         hasError: true,
         error: action.payload,
+        isDeletedSuccess: false,
       };
     },
     clearDeleteEvents: state => {
@@ -148,6 +161,7 @@ const slice = createSlice({
         isLoading: false,
         hasError: false,
         error: null,
+        isDeletedSuccess: false,
       };
     },
   },

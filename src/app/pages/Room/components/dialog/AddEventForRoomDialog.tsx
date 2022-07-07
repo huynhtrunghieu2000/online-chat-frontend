@@ -14,25 +14,32 @@ import { useDialog } from 'app/components/Dialog/Dialog';
 import RadioCard from 'app/components/RadioCard';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'types';
+import { useRoomSlice } from 'app/pages/Room/slice';
 
-
-
-const AddEventForRoomDialog = (props) => {
+const AddEventForRoomDialog = props => {
   const { setDialog } = useDialog();
   const {
     handleSubmit,
     register,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm();
+  const dispatch = useDispatch();
+  const { actions } = useRoomSlice();
   const room = useSelector((state: RootState) => state.room?.roomDetail);
   const channels = useSelector(
     (state: RootState) => state.room?.roomDetail?.Channels,
   );
   const videoChannels = channels.filter(channel => channel.type === 'video');
-  const { getRootProps, getRadioProps, value } = useRadioGroup({
+  const {
+    getRootProps,
+    getRadioProps,
+    value,
+    setValue: setLocationOption,
+  } = useRadioGroup({
     name: 'location',
     defaultValue: videoChannels.length <= 0 ? 'custom' : 'channel',
   });
@@ -56,6 +63,7 @@ const AddEventForRoomDialog = (props) => {
       channel: channels.filter(channel => channel.id === +data.channel_id)[0],
     };
     const event = {
+      ...props.initData,
       ...data,
       start_time: new Date(data.start).toISOString(),
       end_time: new Date(data.end).toISOString(),
@@ -67,10 +75,25 @@ const AddEventForRoomDialog = (props) => {
     setDialog(null);
   };
 
+  const handleDelete = () => {
+    props.onDelete(props.initData);
+    setDialog(null);
+  };
+
   useEffect(() => {
     if (props.initData) {
       const data = props.initData;
       setValue('title', data.title);
+      setValue('start', data.start_time.split('Z')[0]);
+      setValue('end', data.end_time.split('Z')[0]);
+      setValue('description', data.description);
+      if (String(data.location) === data.location) {
+        setLocationOption('custom');
+        setValue('location_custom', data.location);
+      } else {
+        setLocationOption('channel');
+        setValue('channel_id', data.location.channel.id);
+      }
     }
   }, []);
 
@@ -96,7 +119,7 @@ const AddEventForRoomDialog = (props) => {
       </Box>
       {value === 'channel' ? (
         <Box mt={3}>
-          <FormControl isInvalid={errors.name}>
+          <FormControl>
             <FormLabel htmlFor="channel_id" fontWeight="bold">
               Select a channel
             </FormLabel>
@@ -111,7 +134,7 @@ const AddEventForRoomDialog = (props) => {
         </Box>
       ) : (
         <Box mt={3}>
-          <FormControl isInvalid={errors.name}>
+          <FormControl isInvalid={errors.location_custom}>
             <FormLabel htmlFor="location_custom" fontWeight="bold">
               Enter location
             </FormLabel>
@@ -124,34 +147,34 @@ const AddEventForRoomDialog = (props) => {
               })}
             />
             <FormErrorMessage>
-              {errors.name && errors.name.message}
+              {errors.location_custom && errors.location_custom.message}
             </FormErrorMessage>
           </FormControl>
         </Box>
       )}
       <Divider my={2} />
       {/*  */}
-      <FormControl isInvalid={errors.name}>
+      <FormControl isInvalid={errors.title}>
         <FormLabel htmlFor="title" fontWeight="bold">
           Title
         </FormLabel>
         <Input
           id="title"
           size="lg"
-          placeholder="title"
+          placeholder="Title event"
           {...register('title', {
             required: 'Event title is required',
             minLength: { value: 3, message: 'Minimum length should be 3' },
           })}
         />
         <FormErrorMessage>
-          {errors.name && errors.name.message}
+          {errors.title && errors.title.message}
         </FormErrorMessage>
       </FormControl>
       {/*  */}
       <Box display="flex" gap={2} my={2}>
         <Box flex={1}>
-          <FormControl isInvalid={errors.name}>
+          <FormControl isInvalid={errors.start}>
             <FormLabel htmlFor="start" fontWeight="bold">
               Start
             </FormLabel>
@@ -163,15 +186,21 @@ const AddEventForRoomDialog = (props) => {
               min={new Date().toISOString().split('T')[0]}
               {...register('start', {
                 required: 'Event start date is required',
+                validate: (value: string) => {
+                  return (
+                    new Date(value).getTime() > new Date().getTime() ||
+                    'Start time must in future.'
+                  );
+                },
               })}
             />
             <FormErrorMessage>
-              {errors.name && errors.name.message}
+              {errors.start && errors.start.message}
             </FormErrorMessage>
           </FormControl>
         </Box>
         <Box flex={1}>
-          <FormControl isInvalid={errors.name}>
+          <FormControl isInvalid={errors.end}>
             <FormLabel htmlFor="end" fontWeight="bold">
               End
             </FormLabel>
@@ -182,17 +211,23 @@ const AddEventForRoomDialog = (props) => {
               type="datetime-local"
               {...register('end', {
                 required: 'Event end date is required',
-                min: new Date().toISOString().split('T')[0],
+                validate: (value: string) => {
+                  const startDate = getValues('start');
+                  return (
+                    new Date(value).getTime() > new Date(startDate).getTime() ||
+                    'End time must be after start time.'
+                  );
+                },
               })}
             />
             <FormErrorMessage>
-              {errors.name && errors.name.message}
+              {errors.end && errors.end.message}
             </FormErrorMessage>
           </FormControl>
         </Box>
       </Box>
       {/*  */}
-      <FormControl isInvalid={errors.name}>
+      <FormControl isInvalid={errors.description}>
         <FormLabel htmlFor="description" fontWeight="bold">
           Description
         </FormLabel>
@@ -203,23 +238,34 @@ const AddEventForRoomDialog = (props) => {
           {...register('description')}
         />
         <FormErrorMessage>
-          {errors.name && errors.name.message}
+          {errors.description && errors.description.message}
         </FormErrorMessage>
       </FormControl>
-      <Box alignSelf="end" mt={5}>
-        <Button
-          onClick={() => {
-            setDialog(null);
-          }}
-          colorScheme="orange"
-          mr={2}
-          w={'90px'}
-        >
-          Close
-        </Button>
-        <Button type="submit" colorScheme="purple" w={'90px'}>
-          Save
-        </Button>
+      <Box display="flex" justifyContent="space-between" mt={5}>
+        <Box>
+          {props.initData ? (
+            <Button onClick={handleDelete} colorScheme="red" w={'90px'}>
+              Delete
+            </Button>
+          ) : (
+            ''
+          )}
+        </Box>
+        <Box>
+          <Button
+            onClick={() => {
+              setDialog(null);
+            }}
+            colorScheme="orange"
+            mr={2}
+            w={'90px'}
+          >
+            Close
+          </Button>
+          <Button type="submit" colorScheme="purple" w={'90px'}>
+            Save
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

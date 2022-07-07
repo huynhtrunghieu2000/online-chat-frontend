@@ -27,6 +27,8 @@ import RegisterVerify from './containers/RegisterVerify';
 import { messages } from './messages';
 import { useAuthSliceSlice } from './slice';
 import ChangePassword from './containers/ChangePassword';
+import ForgotPasswordVerify from './containers/ForgotPasswordVerify';
+import ResetPassword from './containers/ResetPassword';
 
 export function Auth() {
   const { path } = useRouteMatch();
@@ -54,7 +56,7 @@ export function Auth() {
   }, [userData, history, fromPath]);
 
   return (
-    <Box>
+    <Box overflow="scroll">
       <Switch>
         <Route exact path={`${path}`}>
           <Redirect to={`${path}/login`} />
@@ -71,6 +73,16 @@ export function Auth() {
           path={`${path}/forgot-password`}
           component={ForgotPassword}
         />
+        <Route
+          exact
+          path={`${path}/forgot-password-verify`}
+          component={ForgotPasswordVerify}
+        />
+        {/* <Route
+          exact
+          path={`${path}/reset-password`}
+          component={ResetPassword}
+        /> */}
         <Route component={NotFoundPage} />
       </Switch>
     </Box>

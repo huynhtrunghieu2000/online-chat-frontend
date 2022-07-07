@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -126,7 +127,7 @@ const Profile = (props: Props) => {
 
   return (
     <Container maxW="4xl">
-      <Text textAlign="center" fontSize="2xl" fontWeight="bold" pt={3}>
+      <Text textAlign="center" fontSize="2xl" fontWeight="bold" my={8}>
         Update your profile
       </Text>
       <Box display="flex" mt={4}>
@@ -136,9 +137,6 @@ const Profile = (props: Props) => {
             name={userData?.first_name || userData?.last_name}
             saveCallback={updateUserProfile}
           />
-          <Button onClick={() => history.push('/profile/change-password')} mt={10}>
-            Change password
-          </Button>
         </Box>
         <Box
           flex={7}
@@ -147,7 +145,12 @@ const Profile = (props: Props) => {
           onSubmit={handleSubmit(onSubmit)}
           display="flex"
           flexDir="column"
+          mt={2}
         >
+          <Text fontSize="lg" fontWeight="bold" mb={1}>
+            Personal Information
+          </Text>
+          <Divider color="gray.500" mb={4} />
           {infoForm.map(field => (
             <FormControl isInvalid={errors[field.name]} key={field.name} mb={2}>
               <FormLabel htmlFor="name">{field.label}</FormLabel>
@@ -162,20 +165,30 @@ const Profile = (props: Props) => {
               </FormErrorMessage>
             </FormControl>
           ))}
+          <Text fontSize="lg" fontWeight="bold" mb={1} mt={2}>
+            Security
+          </Text>
+          <Divider color="gray.500" mb={4} />
           <Button
-            mt={4}
-            mr={0}
-            ml="auto"
-            alignSelf="flex-end"
-            colorScheme="purple"
-            isLoading={isSubmitting}
-            type="submit"
+            w={200}
+            onClick={() => history.push('/profile/change-password')}
+            mr={2}
           >
-            Save
+            Change password
           </Button>
+          <Box alignSelf="flex-end" mt={4}>
+            <Button
+              mr={0}
+              ml="auto"
+              colorScheme="purple"
+              isLoading={isSubmitting}
+              type="submit"
+            >
+              Save
+            </Button>
+          </Box>
         </Box>
       </Box>
-      
     </Container>
   );
 };

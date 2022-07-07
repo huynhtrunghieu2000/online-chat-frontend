@@ -4,6 +4,7 @@ export class Event {
   start: Date;
   end: Date;
   description: string;
+  location: any;
 
   constructor(data: any) {
     this.event_id = data.id || -1;
@@ -11,6 +12,7 @@ export class Event {
     this.start = new Date(data.start_time);
     this.end = new Date(data.end_time);
     this.description = data.description || '';
+    this.location = data.location || null;
   }
 
   static toRequestBody(event) {

@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import PrivateRoute from 'app/core/modules/PrivateRoute';
 import ChannelContent from './ChannelContent';
 import { RootState } from 'types';
+import { SocketClient } from 'app/core/contexts/socket-client';
 
 const RoomContent = () => {
   const { url } = useRouteMatch();
@@ -42,7 +43,7 @@ const RoomContent = () => {
         status: 'error',
       });
 
-      history.push('/' + room.error.status);
+      history.push('/' + room?.error?.status || '500');
     }
   }, [room]);
 

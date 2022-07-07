@@ -367,7 +367,8 @@ const CallingSection = ({
               }}
             />
           </Box>
-          <IconButton aria-label="chat" icon={<Settings fontSize="small" />} />
+          <Box></Box>
+          {/* <IconButton aria-label="chat" icon={<Settings fontSize="small" />} /> */}
         </Box>
       </Box>
     </Box>

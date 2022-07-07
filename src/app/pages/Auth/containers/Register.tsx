@@ -14,6 +14,7 @@ import {
   InputRightElement,
   Link,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { Link as RouterLink } from 'react-router-dom';
@@ -27,6 +28,7 @@ import { RootState } from 'types';
 import EmailSentImage from 'assets/images/mail_sent.svg';
 
 function Register() {
+  const toast = useToast();
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { actions } = useAuthSliceSlice();
@@ -44,6 +46,9 @@ function Register() {
   const isLoading = useSelector(
     (state: RootState) => state.authSlice?.isLoading,
   );
+  const error = useSelector(
+    (state: RootState) => state.authSlice?.errorMessage,
+  );
 
   const registerFields = [
     {
@@ -57,6 +62,33 @@ function Register() {
           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
           message: 'Invalid email address',
         },
+      },
+    },
+    {
+      name: 'first_name',
+      label: 'First name',
+      type: 'text',
+      placeholder: 'First name',
+      validation: {
+        required: 'First name is required',
+      },
+    },
+    {
+      name: 'last_name',
+      label: 'Last name',
+      type: 'text',
+      placeholder: 'Last name',
+      validation: {
+        required: 'Last name is required',
+      },
+    },
+    {
+      name: 'bio',
+      label: 'Bio',
+      type: 'text',
+      placeholder: 'Something about you',
+      validation: {
+        required: 'Bio is required',
       },
     },
     {
@@ -96,32 +128,60 @@ function Register() {
     };
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      toast({
+        status: 'error',
+        title: 'Register failed',
+        description: error,
+      });
+
+      dispatch(actions.clearRegister());
+    }
+  }, [error]);
+
   return (
-    <Box>
+    <Box overflow="scroll">
       <Helmet>
         <title>Register</title>
       </Helmet>
 
-      <Center w="full" mt={24} flexDirection="column">
+      <Center
+        w="full"
+        mt={24}
+        flexDirection="column"
+        overflow="scroll"
+        borderRadius={4}
+        pb={16}
+      >
         {/* <Image src={LogoImage} w={20} h={20} mb={5} /> */}
         {!isRegisterSuccess ? (
           <>
             <Text fontSize="3xl" fontWeight="extrabold" lineHeight={1.2}>
               Welcome to {APP_NAME}
             </Text>
-            <Text fontSize="3xl" fontWeight="extrabold" lineHeight={1.2} mb={5}>
-              Register to getting started
-            </Text>
             <Text fontSize="sm" fontWeight="light" lineHeight={1.2}>
               Tell us some details about you
             </Text>
             <Box
               as="form"
-              w="96"
-              p={5}
-              mt={5}
+              w={400}
+              p={8}
+              my={5}
               onSubmit={handleSubmit(onSubmit)}
+              border="1px solid"
+              borderColor="gray.300"
+              borderRadius={4}
             >
+              <Text
+                fontSize="2xl"
+                fontWeight="extrabold"
+                lineHeight={1.2}
+                mb={5}
+                textAlign="center"
+              >
+                Register
+              </Text>
               {registerFields.map(field => (
                 <FormControl
                   mb={3}
@@ -177,12 +237,32 @@ function Register() {
                 Register
               </Button>
             </Box>
+            <Box display="flex" mt={5}>
+              <Text fontSize="sm" display="inline">
+                Already have account?
+              </Text>
+              &nbsp;
+              <Link
+                fontSize="sm"
+                as={RouterLink}
+                to="/auth/login"
+                color="purple.500"
+              >
+                Login
+              </Link>
+            </Box>
           </>
         ) : (
-          <>
+          <Center
+            flexDir="column"
+            borderRadius={4}
+            border="1px solid"
+            borderColor="gray.200"
+            p={8}
+          >
             <Image src={EmailSentImage} h="100px" mb={6} />
             <Text>Please check your email to verify account.</Text>
-          </>
+          </Center>
         )}
       </Center>
     </Box>

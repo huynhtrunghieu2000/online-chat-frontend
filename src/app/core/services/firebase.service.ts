@@ -29,12 +29,12 @@ declare global {
   // eslint-disable-next-line no-var
   var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean | string | undefined;
 }
-window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+// window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('4F32253F-3484-4761-9E93-D98B704FF267'),
+  provider: new ReCaptchaV3Provider('6LcrH8cgAAAAADTfSKoKx9LOA0xlSPLlkmLpZLtK'),
   // Optional argument. If true, the SDK automatically refreshes App Check
   // tokens as needed.
-  // isTokenAutoRefreshEnabled: true,
+  isTokenAutoRefreshEnabled: true,
 });
 // export const analytics = getAnalytics(app);
 export const storage = getStorage(app);

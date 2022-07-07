@@ -218,13 +218,20 @@ const CreateRoomDialog = ({ isOpen, onClose, onSubmit }) => {
       setError('Name must be at least 3 characters');
     } else setError('');
   }, [name]);
+
+  useEffect(() => {
+    return () => {
+      setName('');
+      setError('');
+    };
+  }, []);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Create new room</ModalHeader>
         <ModalCloseButton />
-        <ModalBody pb={6}>
+        <ModalBody pb={4}>
           <FormControl>
             <FormLabel>Room's name</FormLabel>
             <Input
@@ -235,12 +242,12 @@ const CreateRoomDialog = ({ isOpen, onClose, onSubmit }) => {
                 setName(e.target.value);
               }}
             />
-            {!!error && <FormErrorMessage>{error}</FormErrorMessage>}
+            <FormErrorMessage>{error}</FormErrorMessage>
           </FormControl>
         </ModalBody>
         <ModalFooter>
           <Button
-            colorScheme="blue"
+            colorScheme="purple"
             mr={3}
             onClick={() => onSubmit(name)}
             disabled={!!error || !name}

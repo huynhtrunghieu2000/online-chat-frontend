@@ -6,4 +6,7 @@ export interface CalendarState {
   isProcessing: boolean;
   hasError: boolean;
   error: any;
+  isCreatedSuccess: boolean;
+  isUpdatedSuccess: boolean;
+  isDeletedSuccess: boolean;
 }
