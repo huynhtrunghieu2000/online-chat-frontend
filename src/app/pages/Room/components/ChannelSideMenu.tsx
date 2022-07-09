@@ -230,7 +230,7 @@ const ChannelSideMenu = () => {
 
     dialog.setDialog({
       title: 'Leave Room',
-      content: <ConfirmLeaveRoom onClose={leaveRoom} />,
+      content: <ConfirmLeaveRoom mode="leave" onClose={leaveRoom} />,
       onClose: dialog.setDialog(null),
       size: '2xl',
     });
@@ -246,7 +246,7 @@ const ChannelSideMenu = () => {
 
     dialog.setDialog({
       title: 'Delete Room',
-      content: <ConfirmLeaveRoom onClose={handleDeleteRoom} />,
+      content: <ConfirmLeaveRoom mode="delete" onClose={handleDeleteRoom} />,
       onClose: dialog.setDialog(null),
       size: '2xl',
     });
@@ -447,14 +447,14 @@ const ChannelSideMenu = () => {
   );
 };
 
-const ConfirmLeaveRoom = ({ onClose }) => {
+const ConfirmLeaveRoom = ({ onClose, mode }) => {
   const { setDialog } = useDialog();
 
   return (
     <Box display="flex" flexDir="column">
       <Text mb={7}>
-        After leave you can not read or send message in this room anymore. Are
-        you sure to leave?{' '}
+        After {mode} you can not read or send message in this room anymore. Are
+        you sure to {mode}?{' '}
       </Text>
       <Box alignSelf="end">
         <Button
@@ -467,14 +467,13 @@ const ConfirmLeaveRoom = ({ onClose }) => {
           Cancel
         </Button>
         <Button
-          mr={3}
           onClick={() => {
             onClose();
             setDialog(null);
           }}
           colorScheme="red"
         >
-          Leave
+          {mode.charAt(0).toUpperCase() + mode.slice(1)}
         </Button>
       </Box>
     </Box>

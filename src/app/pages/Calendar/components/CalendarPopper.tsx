@@ -13,17 +13,21 @@ const CalendarPopper = (fields, event) => {
   const linkLocation = !isLocationChannel
     ? null
     : `/rooms/${eventLocation?.room?.id}/${eventLocation?.channel?.id}`;
-
+  console.log(eventLocation)
   return (
     <Box>
       <Box display="flex" alignItems="center">
-        <Icon
-          as={LocationOn}
-          mr={1.5}
-          boxSize="22px"
-          ml={0.5}
-          color="rgba(0, 0, 0, 0.6)"
-        />
+        {eventLocation ? (
+          <Icon
+            as={LocationOn}
+            mr={1.5}
+            boxSize="22px"
+            ml={0.5}
+            color="rgba(0, 0, 0, 0.6)"
+          />
+        ) : (
+          ''
+        )}
         {eventLocation &&
           (linkLocation ? (
             <Text

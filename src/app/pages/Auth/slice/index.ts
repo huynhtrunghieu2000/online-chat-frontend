@@ -322,7 +322,6 @@ const slice = createSlice({
       return {
         ...state,
         isLoading: true,
-        ...action.payload,
       };
     },
     registerVerifySuccess(state, action: PayloadAction<any>) {
@@ -337,7 +336,7 @@ const slice = createSlice({
         ...state,
         isLoading: false,
         isError: true,
-        errorMessage: action.payload.message,
+        errorMessage: action.payload.data.message,
       };
     },
     clearRegisterVerify(state) {

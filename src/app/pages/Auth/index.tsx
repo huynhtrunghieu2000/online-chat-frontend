@@ -51,7 +51,7 @@ export function Auth() {
       dispatch(actions.getLoggedInUser());
     } else if (!userData?.id && !getToken()) {
       dispatch(actions.logout());
-      history.push('/auth/login');
+      // history.push('/auth/login');
     }
   }, [userData, history, fromPath]);
 

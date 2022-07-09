@@ -102,7 +102,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start:prod": "yarn run build && serve -s build",
+    "start:prod": "CI=false && yarn run build && serve -s build",
     "test:generators": "ts-node ./internals/testing/generators/test-generators.ts",
     "checkTs": "tsc --noEmit",
     "eslint": "eslint --ext js,ts,tsx",

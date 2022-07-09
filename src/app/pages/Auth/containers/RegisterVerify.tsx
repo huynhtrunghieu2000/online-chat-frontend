@@ -1,22 +1,27 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { useAuthSliceSlice } from '../slice';
 import { selectAuthSlice } from '../slice/selectors';
 import { RootState } from 'types';
 import {
   Box,
   Center,
+  CircularProgress,
   Icon,
   Image,
   Link,
   Spinner,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import { WarningIcon } from '@chakra-ui/icons';
 import DoneImage from 'assets/images/done-illustration.svg';
+import { isAuthenticated } from 'app/core/modules/PrivateRoute';
 
 const RegisterVerify = () => {
+  const history = useHistory();
+  const toast = useToast();
   const token = new URLSearchParams(window.location.search).get('token');
   const dispatch = useDispatch();
   const { actions } = useAuthSliceSlice();
@@ -26,12 +31,29 @@ const RegisterVerify = () => {
   const isLoading = useSelector(
     (state: RootState) => state?.authSlice?.isLoading,
   );
+  const error = useSelector(
+    (state: RootState) => state?.authSlice?.errorMessage,
+  );
   useEffect(() => {
-    if (token) {
+    if (token && !isAuthenticated()) {
       dispatch(actions.registerVerify(token));
     }
+    return () => {
+      dispatch(actions.clearRegisterVerify());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        status: 'error',
+        title: 'Verify not success',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
+
   return isLoading ? (
     <Spinner
       color="primary"
@@ -54,6 +76,9 @@ const RegisterVerify = () => {
           </Link>
         </>
       ) : (
+        <CircularProgress />
+      )}
+      {error ? (
         <>
           <Icon as={WarningIcon} color="secondary" w="28" h="28" mb={5} />
           <Text fontSize="lg" fontWeight="bold">
@@ -63,6 +88,8 @@ const RegisterVerify = () => {
             Back to login
           </Link>
         </>
+      ) : (
+        ''
       )}
     </Center>
   );

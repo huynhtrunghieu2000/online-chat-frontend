@@ -4,6 +4,7 @@ import { useInjectReducer, useInjectSaga } from 'utils/redux-injectors';
 import { calendarSaga } from './saga';
 import { CalendarState } from './types';
 import { Event } from 'app/core/models/Event';
+import { sanitizeObject } from 'app/core/utils/dataUtils';
 
 export const initialState: CalendarState = {
   events: null,
@@ -96,13 +97,16 @@ const slice = createSlice({
       };
     },
     updateEventsSuccess: (state, action: PayloadAction<any>) => {
-      const newEvents = (state.events as Event[]).filter(
-        event => event.event_id !== action.payload.event_id,
+
+      const newEvents = (state.events as Event[]).map(event =>
+        event.event_id !== action.payload.event_id
+          ? event
+          : { ...event, ...sanitizeObject(action.payload) },
       );
       return {
         ...state,
         isLoading: false,
-        events: [...newEvents, action.payload],
+        events: newEvents,
         error: null,
         hasError: false,
         isUpdatedSuccess: true,

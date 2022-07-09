@@ -152,6 +152,43 @@ const MemberDialog = ({ onClose }) => {
           </Box>
         ))}
       </Box>
+      {!currentRoom.is_private && (
+        <Box
+          backgroundColor="purple.100"
+          borderRadius={4}
+          p={3}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box>
+            <Text fontSize="sm">Anyone can join room with link: </Text>
+            <Text
+              fontSize="sm"
+              textDecoration="underline"
+              cursor="pointer"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `https://localhost:3000/invite/${currentRoom.code}`,
+                );
+                toast({ status: 'success', title: 'Copied' });
+              }}
+            >
+              https://localhost:3000/invite/{currentRoom.code}
+            </Text>
+          </Box>
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(
+                `https://localhost:3000/invite/${currentRoom.code}`,
+              );
+              toast({ status: 'success', title: 'Copied' });
+            }}
+          >
+            Copy link
+          </Button>
+        </Box>
+      )}
       <Box alignSelf="end" mt={5}>
         <Button
           mr={3}

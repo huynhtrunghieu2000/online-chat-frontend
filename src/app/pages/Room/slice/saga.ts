@@ -64,7 +64,9 @@ function* joinRoomByInviteCode({ payload }) {
       payload,
     );
     yield put(actions.joinRoomByInviteCodeSuccess(response));
+    console.log(response)
   } catch (error) {
+    console.log("🚀 ~ file: saga.ts ~ line 69 ~ function*joinRoomByInviteCode ~ error", error)
     yield put(actions.joinRoomByInviteCodeFailure(error));
   }
 }
@@ -104,8 +106,7 @@ function* deleteRoom({ payload }) {
       `${API_ENDPOINT.room.index}/${payload.id}`,
       payload,
     );
-    console.log(response);
-    yield put(actions.deleteRoomSuccess(response));
+    yield put(actions.deleteRoomSuccess(payload.id));
   } catch (error) {
     yield put(actions.deleteRoomFailure(error));
   }

@@ -6,7 +6,7 @@ import { roomSaga } from './saga';
 import { RoomState } from './types';
 
 export const initialState: RoomState = {
-  roomList: undefined,
+  roomList: [],
   roomDetail: undefined,
   channelDetail: undefined,
   messages: [],
@@ -587,6 +587,7 @@ const slice = createSlice({
       return {
         ...state,
         isLoading: false,
+        roomList: [...state.roomList, action.payload],
         roomDetail: action.payload,
         isJoinRoomSuccess: true,
       };

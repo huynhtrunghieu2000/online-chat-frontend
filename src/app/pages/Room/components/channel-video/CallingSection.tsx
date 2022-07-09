@@ -290,7 +290,7 @@ const CallingSection = ({
           zIndex={1}
           background="linear-gradient(to bottom, rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 100%)"
         >
-          <IconButton aria-label="chat" icon={<PersonAdd fontSize="small" />} />
+          {/* <IconButton aria-label="chat" icon={<PersonAdd fontSize="small" />} /> */}
         </Box>
         {/* BOTTOM ACTION */}
         <Box

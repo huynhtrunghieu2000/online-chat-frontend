@@ -148,7 +148,7 @@ const NotificationBody = () => {
           </Box>
         ))
       ) : (
-        <Box></Box>
+        <Box>You have no notification.</Box>
       )}
     </Box>
   );

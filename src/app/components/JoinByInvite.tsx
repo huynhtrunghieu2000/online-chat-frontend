@@ -21,6 +21,7 @@ const JoinByInvite = () => {
   const dispatch = useDispatch();
   const currentRoom = useSelector((state: RootState) => state.room?.roomDetail);
   const isLoading = useSelector((state: RootState) => state.room?.isLoading);
+  const error = useSelector((state: RootState) => state.room?.error);
   const isJoinRoomSuccess = useSelector(
     (state: RootState) => state.room?.isJoinRoomSuccess,
   );
@@ -28,6 +29,10 @@ const JoinByInvite = () => {
   useEffect(() => {
     console.log(params);
     dispatch(actions.getRoomByInviteCode(params));
+
+    return () => {
+      dispatch(actions.clearJoinRoomByInviteCode());
+    };
   }, []);
 
   useEffect(() => {
@@ -40,6 +45,16 @@ const JoinByInvite = () => {
       history.push(`/rooms/${currentRoom.id}`);
     }
   }, [isJoinRoomSuccess]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        status: 'error',
+        title: error.data.message || 'Something wrong',
+        description: 'Check your invitation again',
+      });
+    }
+  }, [error]);
 
   const onJoinNow = () => {
     dispatch(actions.joinRoomByInviteCode(params));
@@ -83,8 +98,17 @@ const JoinByInvite = () => {
               Join now
             </Button>
           </>
+        ) : error ? (
+          error.data.message
         ) : (
           <CircularProgress />
+        )}
+        {error ? (
+          <Button colorScheme="purple" onClick={() => history.push('/rooms')}>
+            Back to rooms
+          </Button>
+        ) : (
+          ''
         )}
       </Box>
     </Center>
