@@ -6,6 +6,16 @@ name: Deploy to Firebase Hosting on merge
   push:
     branches:
       - main
+
+env:
+  BROWSER: none
+  EXTEND_ESLINT: true
+  FAST_REFRESH: true
+  REACT_APP_API_URL: http://ec2-44-228-236-196.us-west-2.compute.amazonaws.com/
+  SSL_CRT_FILE: ./src/app/config/cert.pem
+  SSL_KEY_FILE: ./src/app/config/key.pem
+  HTTPS: true
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
