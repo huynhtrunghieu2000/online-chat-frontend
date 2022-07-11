@@ -31,7 +31,7 @@ declare global {
 }
 // window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LcrH8cgAAAAADTfSKoKx9LOA0xlSPLlkmLpZLtK'),
+  provider: new ReCaptchaV3Provider('6LcAQuEgAAAAANeRii03qpoB1sHha6KbhOwQ6TjU'),
   // Optional argument. If true, the SDK automatically refreshes App Check
   // tokens as needed.
   isTokenAutoRefreshEnabled: true,
