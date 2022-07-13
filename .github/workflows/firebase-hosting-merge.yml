@@ -11,7 +11,7 @@ env:
   BROWSER: none
   EXTEND_ESLINT: true
   FAST_REFRESH: true
-  REACT_APP_API_URL: https://hieu-huynh-meeting-server.tk/
+  REACT_APP_API_URL: https://hieu-huynh-meeting-server.tk
   SSL_CRT_FILE: ./src/app/config/cert.pem
   SSL_KEY_FILE: ./src/app/config/key.pem
   HTTPS: true
