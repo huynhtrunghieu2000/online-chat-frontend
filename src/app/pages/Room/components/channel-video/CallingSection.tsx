@@ -20,6 +20,7 @@ import { RootState } from 'types';
 import { useRoomSlice } from '../../slice';
 import ChatBox from './ChatBox';
 import AudioSpectrum from 'react-audio-spectrum';
+import Username from 'app/components/Username';
 
 const CallingSection = ({
   localVideoStream,
@@ -209,7 +210,9 @@ const CallingSection = ({
               borderRadius="5px"
               // display="flex"
             >
-              <Text mr={1}>{localUserInfo?.email}</Text>
+              <Box mr={1}>
+                <Username user={localUserInfo} />
+              </Box>
             </Box>
           </Box>
           {Object.keys(remoteVideos).map((key: any, index: number) => {
@@ -270,7 +273,9 @@ const CallingSection = ({
             borderRadius="5px"
             // display="flex"
           >
-            <Text mr={1}>{localUserInfo?.email}</Text>
+            <Box mr={1}>
+              <Username user={localUserInfo} />
+            </Box>
           </Box>
         </Box>
         {/* TOP BAR ACTION */}

@@ -42,7 +42,7 @@ const ChannelContent = () => {
   };
 
   return (
-    <Box w="full" h="full">
+    <Box flex={1} h="full">
       {channelDetail?.type === CHANNEL_TYPE.TEXT && (
         <ChannelText
           message={messages}

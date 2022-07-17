@@ -16,6 +16,7 @@ import RoomContent from './containers/RoomContent';
 import { useRoomSlice } from './slice';
 import RoomEntry from 'assets/images/room-get-in.svg';
 import { RootState } from 'types';
+import FriendList from './components/FriendList';
 interface Props {}
 
 export function Room(props: Props) {
@@ -27,6 +28,9 @@ export function Room(props: Props) {
 
   const socketCondition = useSelector(
     (state: RootState) => state.room?.socketCondition,
+  );
+  const currentMeeting = useSelector(
+    (state: RootState) => state.room?.currentMeeting,
   );
 
   useEffect(() => {

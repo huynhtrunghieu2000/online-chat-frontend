@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { MoreVert } from '@mui/icons-material';
 import { useDialog } from 'app/components/Dialog/Dialog';
+import { CURRENT_HOST } from 'app/config';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'types';
@@ -169,18 +170,18 @@ const MemberDialog = ({ onClose }) => {
               cursor="pointer"
               onClick={() => {
                 navigator.clipboard.writeText(
-                  `https://localhost:3000/invite/${currentRoom.code}`,
+                  `${CURRENT_HOST}/invite/${currentRoom.code}`,
                 );
                 toast({ status: 'success', title: 'Copied' });
               }}
             >
-              https://localhost:3000/invite/{currentRoom.code}
+              {`${CURRENT_HOST}/invite/${currentRoom.code}`}
             </Text>
           </Box>
           <Button
             onClick={() => {
               navigator.clipboard.writeText(
-                `https://localhost:3000/invite/${currentRoom.code}`,
+                `${CURRENT_HOST}/invite/${currentRoom.code}`,
               );
               toast({ status: 'success', title: 'Copied' });
             }}

@@ -4,6 +4,7 @@ import React, { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { messages } from './messages';
 import AttachmentComponent from './AttachmentComponent';
+import Username from '../Username';
 
 interface Props {
   messageList: any[];
@@ -47,18 +48,9 @@ const MessageBox = memo(({ messageList, avatarSize, channelType }: Props) => {
             />
             <Box ml={avatarSize === 'sm' ? 2 : 5}>
               <Box display="flex" alignItems="baseline">
-                <Text
-                  maxWidth={channelType === 'video' ? '50%' : ''}
-                  lineHeight="none"
-                  pb={2}
-                  mr={3}
-                  fontWeight={500}
-                  whiteSpace="nowrap"
-                  overflow="hidden"
-                  textOverflow="ellipsis"
-                >
-                  {message.User.name || message.User.email}
-                </Text>
+                <Box pb={2} mr={3}>
+                  <Username user={message.User} />
+                </Box>
                 <Text fontSize="sm" lineHeight="none" color="gray.500">
                   {moment(message.createdAt).format(
                     channelType === 'text' ? 'HH:mm | MMM DD, YYYY' : 'HH:mm',

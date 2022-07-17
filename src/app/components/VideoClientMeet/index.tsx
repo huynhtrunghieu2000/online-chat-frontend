@@ -1,6 +1,7 @@
 import { Avatar, Box, Text } from '@chakra-ui/react';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import Username from '../Username';
 import { messages } from './messages';
 
 interface Props {}
@@ -87,7 +88,9 @@ const VideoClientMeet = memo((props: any) => {
         borderRadius="5px"
         // display="flex"
       >
-        <Text mr={1}>{props?.peer.info.email}</Text>
+        <Box mr={1} color="gray.300">
+          <Username user={props?.peer.info} />
+        </Box>
       </Box>
     </Box>
   );

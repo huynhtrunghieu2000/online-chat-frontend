@@ -40,6 +40,7 @@ const MessageEditor = (props: Props) => {
   const handleKeyDown = (e: any) => {
     if (e.key === 'Enter' && !e.ctrlKey) {
       e.preventDefault();
+      if (message.length === 0 && files.length === 0) return;
       setIsSending(true);
       handleSubmit();
     } else if (e.key === 'Enter' && e.ctrlKey) {
@@ -48,15 +49,17 @@ const MessageEditor = (props: Props) => {
   };
 
   const handleSubmit = async () => {
+    if (message.length === 0 && files.length === 0) return;
+    const messageTrimmed = String(message).trim();
     if (files.length) {
       const listUrl = await handleSubmitWithFile();
       const data = {
-        message,
+        message: messageTrimmed,
         attachments: listUrl,
       };
       props.onSubmit(data);
     } else {
-      props.onSubmit({ message });
+      props.onSubmit({ message: messageTrimmed });
     }
     setFiles([]);
     setMessage('');

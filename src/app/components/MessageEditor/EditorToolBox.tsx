@@ -8,8 +8,9 @@ const EditorToolBox = ({ onChooseFile }) => {
   const onFilesError = err => {
     toast({
       title: err.message,
+      description: 'Max file size is 10MB.',
       status: 'warning',
-      duration: 1000,
+      duration: 2000,
     });
   };
   return (

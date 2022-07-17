@@ -12201,6 +12201,11 @@ react-shallow-renderer@^16.13.1:
     object-assign "^4.1.1"
     react-is "^16.12.0 || ^17.0.0 || ^18.0.0"
 
+react-simple-video-player@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-simple-video-player/-/react-simple-video-player-1.0.0.tgz#96a2f2777da3009c3a73904fdc16f35f4ddd2e0e"
+  integrity sha512-yY5zdYsJ2wsW0tEE6GwZCOoDe4Ix6sOCUmkk+xO/wVc7/8bxNJAtMSmwzp6wPGIxunn95eIgiONef2yaIJOvaA==
+
 react-style-singleton@^2.1.0, react-style-singleton@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/react-style-singleton/-/react-style-singleton-2.2.0.tgz#70f45f5fef97fdb9a52eed98d1839fa6b9032b22"

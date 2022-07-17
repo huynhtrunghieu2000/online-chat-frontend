@@ -18,6 +18,7 @@ import PrivateRoute from 'app/core/modules/PrivateRoute';
 import ChannelContent from './ChannelContent';
 import { RootState } from 'types';
 import { SocketClient } from 'app/core/contexts/socket-client';
+import FriendList from '../components/FriendList';
 
 const RoomContent = () => {
   const { url } = useRouteMatch();
@@ -29,10 +30,22 @@ const RoomContent = () => {
   const currentMeeting = useSelector(
     (state: RootState) => state.room?.currentMeeting,
   );
+  const currentRoom = useSelector((state: RootState) => state.room?.roomDetail);
+  const currentChannel = useSelector(
+    (state: RootState) => state.room?.channelDetail,
+  );
 
   const room = useSelector((state: RootState) => state.room);
   useEffect(() => {
     dispatch(roomActions.getRoomDetail({ id: idRoom }));
+    const renewRoom = setInterval(() => {
+      dispatch(roomActions.getRoomDetail({ id: idRoom }));
+    }, 5000);
+    return () => {
+      clearInterval(renewRoom);
+      dispatch(roomActions.clearGetRoomDetail());
+      dispatch(roomActions.clearGetChannelDetail());
+    };
   }, [idRoom]);
 
   useEffect(() => {
@@ -51,6 +64,18 @@ const RoomContent = () => {
     <Box bgColor="gray.100" w="full" h="full" display="flex">
       {!currentMeeting && <ChannelSideMenu />}
       <PrivateRoute path={`${url}/:idChannel`} component={ChannelContent} />
+      {!currentChannel && (
+        <Box
+          flex={1}
+          h="full"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          Please choose a channel
+        </Box>
+      )}
+      {!currentMeeting && <FriendList list={currentRoom?.Users} />}
     </Box>
   );
 };

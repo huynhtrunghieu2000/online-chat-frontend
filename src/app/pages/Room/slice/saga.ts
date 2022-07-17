@@ -37,8 +37,12 @@ function* getRoomDetail({ payload }) {
       `${API_ENDPOINT.room.index}/${payload.id}`,
       {},
     );
-    console.log(response);
-    yield put(actions.getRoomDetailSuccess(response));
+    let newRes = yield new Promise(resolve => {
+      socketService.emit('get:list_online', { Users: response.Users }, data => {
+        resolve({ ...response, Users: data });
+      });
+    });
+    yield put(actions.getRoomDetailSuccess(newRes));
   } catch (error) {
     yield put(actions.getRoomDetailFailure(error));
   }
@@ -64,9 +68,12 @@ function* joinRoomByInviteCode({ payload }) {
       payload,
     );
     yield put(actions.joinRoomByInviteCodeSuccess(response));
-    console.log(response)
+    console.log(response);
   } catch (error) {
-    console.log("🚀 ~ file: saga.ts ~ line 69 ~ function*joinRoomByInviteCode ~ error", error)
+    console.log(
+      '🚀 ~ file: saga.ts ~ line 69 ~ function*joinRoomByInviteCode ~ error',
+      error,
+    );
     yield put(actions.joinRoomByInviteCodeFailure(error));
   }
 }
