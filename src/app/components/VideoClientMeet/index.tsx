@@ -88,7 +88,7 @@ const VideoClientMeet = memo((props: any) => {
         borderRadius="5px"
         // display="flex"
       >
-        <Box mr={1} color="gray.300">
+        <Box mr={1}>
           <Username user={props?.peer.info} />
         </Box>
       </Box>

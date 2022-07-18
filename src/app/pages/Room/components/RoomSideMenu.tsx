@@ -225,6 +225,11 @@ const CreateRoomDialog = ({ isOpen, onClose, onSubmit }) => {
       setError('');
     };
   }, []);
+
+  const reset = () => {
+    setName('');
+    setError('');
+  };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -249,12 +254,22 @@ const CreateRoomDialog = ({ isOpen, onClose, onSubmit }) => {
           <Button
             colorScheme="purple"
             mr={3}
-            onClick={() => onSubmit(name)}
+            onClick={() => {
+              onSubmit(name);
+              reset();
+            }}
             disabled={!!error || !name}
           >
             Create
           </Button>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button
+            onClick={() => {
+              onClose();
+              reset();
+            }}
+          >
+            Cancel
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

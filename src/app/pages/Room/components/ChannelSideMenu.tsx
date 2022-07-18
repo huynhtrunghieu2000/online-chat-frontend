@@ -318,9 +318,15 @@ const ChannelSideMenu = () => {
         pt={3}
         pb={2}
       >
-        <Text fontWeight={500} fontSize="md">
-          {currentRoom?.name}
-        </Text>
+        <Box>
+          <Text fontWeight={500} fontSize="md" as="span">
+            {currentRoom?.name}
+          </Text>
+          &nbsp;
+          <Text fontWeight={500} fontSize="md" as="span" color="gray.400">
+            #{currentRoom?.id}
+          </Text>
+        </Box>
         <Menu placement="bottom-end" arrowPadding={12}>
           <MenuButton aria-label="Classroom options">
             <Icon as={Settings} />
@@ -371,7 +377,7 @@ const ChannelSideMenu = () => {
                       alignItems="center"
                       cursor="pointer"
                     >
-                      <Icon as={Event} color="gray.500" mr={2}/>
+                      <Icon as={Event} color="gray.500" mr={2} />
                       <Text>{event.title}</Text>
                     </Box>
                   </EventInfoPopOver>
