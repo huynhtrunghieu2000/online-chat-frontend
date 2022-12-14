@@ -35,17 +35,17 @@ const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 
 ReactDOM.render(
-  <Provider store={store}>
-    <HelmetProvider>
-      <React.StrictMode>
-        <ChakraProvider theme={theme}>
-          <DialogProvider>
+  <HelmetProvider>
+    <React.StrictMode>
+      <ChakraProvider theme={theme}>
+        <DialogProvider>
+          <Provider store={store}>
             <App />
-          </DialogProvider>
-        </ChakraProvider>
-      </React.StrictMode>
-    </HelmetProvider>
-  </Provider>,
+          </Provider>
+        </DialogProvider>
+      </ChakraProvider>
+    </React.StrictMode>
+  </HelmetProvider>,
   MOUNT_NODE,
 );
 
