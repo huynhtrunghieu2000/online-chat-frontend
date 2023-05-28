@@ -10,7 +10,9 @@
 
 **Author:** Huynh Trung Hieu
 
-This is front-end repository, and associate with back-end from this repo: [huynhtrunghieu2000/video-conference-backend](https://github.com/huynhtrunghieu2000/video-conference-backend)
+This is front-end repository, and associate with back-end from this repo: [huynhtrunghieu2000/online-chat-backend](https://github.com/huynhtrunghieu2000/online-chat-backend)
+
+Full demo video: [Online Chat App Demo - Hieu Huynh T.](https://drive.google.com/file/d/1t1ywJiOTmhE-gFu5AXQGp93Im2NawmC9/view?usp=share_link)
 
 
 # Features
